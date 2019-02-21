@@ -1,0 +1,5 @@
+@import "hover-ext";
+
+@mixin com_srt_omega {
+  @include com_srt_omega-hover-ext;
+}

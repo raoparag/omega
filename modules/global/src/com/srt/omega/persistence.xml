@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             version="2.0">
+    <persistence-unit name="omega"
+                      transaction-type="RESOURCE_LOCAL">
+        <class>com.srt.omega.entity.ShowVenue</class>
+        <class>com.srt.omega.entity.Country</class>
+        <class>com.srt.omega.entity.PaymentCategory</class>
+        <class>com.srt.omega.entity.Contact</class>
+        <class>com.srt.omega.entity.Organisation</class>
+        <class>com.srt.omega.entity.Industry</class>
+        <class>com.srt.omega.entity.ShowTiming</class>
+        <class>com.srt.omega.entity.Show</class>
+        <class>com.srt.omega.entity.TicketCategory</class>
+        <class>com.srt.omega.entity.BookingItem</class>
+        <class>com.srt.omega.entity.Booking</class>
+    </persistence-unit>
+</persistence>

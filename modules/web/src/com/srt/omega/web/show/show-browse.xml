@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        caption="msg://browseCaption"
+        class="com.srt.omega.web.show.ShowBrowse"
+        focusComponent="showsTable"
+        lookupComponent="showsTable"
+        messagesPack="com.srt.omega.web.show">
+    <dsContext>
+        <groupDatasource id="showsDs"
+                         class="com.srt.omega.entity.Show"
+                         view="show-view">
+            <query>
+                <![CDATA[select e from omega$Show e]]>
+            </query>
+        </groupDatasource>
+    </dsContext>
+    <dialogMode height="600"
+                width="800"/>
+    <layout expand="showsTable"
+            spacing="true">
+        <filter id="filter"
+                applyTo="showsTable"
+                datasource="showsDs">
+            <properties include=".*"/>
+        </filter>
+        <groupTable id="showsTable"
+                    width="100%">
+            <actions>
+                <action id="create"/>
+                <action id="edit"/>
+                <action id="remove"/>
+            </actions>
+            <columns>
+                <column id="name"/>
+                <column id="code"/>
+                <column id="type"/>
+                <column id="startDate"/>
+                <column id="endDate"/>
+                <column id="showVenue"/>
+                <column id="status"/>
+                <column id="notes"/>
+            </columns>
+            <rows datasource="showsDs"/>
+            <rowsCount/>
+            <buttonsPanel id="buttonsPanel"
+                          alwaysVisible="true">
+                <button id="createBtn"
+                        action="showsTable.create"/>
+                <button id="editBtn"
+                        action="showsTable.edit"/>
+                <button id="removeBtn"
+                        action="showsTable.remove"/>
+            </buttonsPanel>
+        </groupTable>
+    </layout>
+</window>

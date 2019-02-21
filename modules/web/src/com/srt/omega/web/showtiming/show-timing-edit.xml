@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        caption="msg://editorCaption"
+        class="com.srt.omega.web.showtiming.ShowTimingEdit"
+        datasource="showTimingDs"
+        focusComponent="fieldGroup"
+        messagesPack="com.srt.omega.web.showtiming">
+    <dsContext>
+        <datasource id="showTimingDs"
+                    class="com.srt.omega.entity.ShowTiming"
+                    view="_local"/>
+    </dsContext>
+    <dialogMode height="600"
+                width="800"/>
+    <layout expand="windowActions"
+            spacing="true">
+        <fieldGroup id="fieldGroup"
+                    datasource="showTimingDs">
+            <column width="250px">
+                <field property="showTime"/>
+                <field property="notes"/>
+            </column>
+        </fieldGroup>
+        <frame id="windowActions"
+               screen="editWindowActions"/>
+    </layout>
+</window>

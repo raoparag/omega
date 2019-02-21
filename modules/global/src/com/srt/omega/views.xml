@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<views xmlns="http://schemas.haulmont.com/cuba/view.xsd">
+    <view class="com.srt.omega.entity.Booking"
+          extends="_local"
+          name="booking-view">
+        <property name="organisation"
+                  view="_minimal"/>
+        <property name="show"
+                  view="_minimal">
+            <property name="code"/>
+        </property>
+        <property name="bookingItems"
+                  view="_minimal">
+            <property name="quantity"/>
+            <property name="paymentCategory"
+                      view="_minimal"/>
+            <property name="discount"/>
+            <property name="sisticFee"/>
+            <property name="seatDetails"/>
+            <property name="ticketCategory"
+                      view="_minimal">
+                <property name="price"/>
+            </property>
+            <property name="showTiming"
+                      view="_minimal">
+                <property name="show"
+                          view="_minimal"/>
+            </property>
+        </property>
+        <property name="srtContact"
+                  view="_minimal"/>
+        <property name="orgContact"
+                  view="_minimal"/>
+    </view>
+    <view class="com.srt.omega.entity.Contact"
+          extends="_local"
+          name="contact-view">
+        <property name="organisation"
+                  view="_minimal"/>
+    </view>
+    <view class="com.srt.omega.entity.BookingItem"
+          extends="_local"
+          name="bookingItem-view">
+        <property name="showTiming"
+                  view="_minimal">
+            <property name="show"
+                      view="_minimal">
+                <property name="showVenue"
+                          view="_minimal">
+                    <property name="capacity"/>
+                </property>
+            </property>
+        </property>
+        <property name="ticketCategory"
+                  view="_minimal">
+            <property name="price"/>
+        </property>
+        <property name="paymentCategory"
+                  view="_minimal"/>
+        <property name="booking"
+                  view="_minimal">
+            <property name="organisation"
+                      view="_minimal">
+                <property name="industry"
+                          view="_minimal"/>
+            </property>
+            <property name="bookingStatus"/>
+            <property name="ticketStatus"/>
+            <property name="totalQuantity"/>
+            <property name="totalPrice"/>
+            <property name="paymentMethod"/>
+            <property name="srtContact"
+                      view="_minimal"/>
+            <property name="orgContact"
+                      view="_minimal"/>
+        </property>
+    </view>
+    <view class="com.srt.omega.entity.ShowTiming"
+          extends="_local"
+          name="showTiming-view">
+        <property name="show"
+                  view="_minimal"/>
+    </view>
+    <view class="com.srt.omega.entity.Organisation"
+          extends="_local"
+          name="organisation-view">
+        <property name="country"
+                  view="_minimal"/>
+        <property name="contacts"
+                  view="_local"/>
+        <property name="industry"
+                  view="_minimal"/>
+    </view>
+    <view class="com.srt.omega.entity.Show"
+          extends="_local"
+          name="show-view">
+        <property name="showTimings"
+                  view="_local"/>
+        <property name="ticketCategories"
+                  view="_local"/>
+        <property name="showVenue"
+                  view="_local"/>
+    </view>
+</views>

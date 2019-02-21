@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        caption="msg://browseCaption"
+        class="com.srt.omega.web.organisation.OrganisationBrowse"
+        focusComponent="organisationsTable"
+        lookupComponent="organisationsTable"
+        messagesPack="com.srt.omega.web.organisation">
+    <dsContext>
+        <groupDatasource id="organisationsDs"
+                         class="com.srt.omega.entity.Organisation"
+                         view="organisation-view">
+            <query>
+                <![CDATA[select e from omega$Organisation e]]>
+            </query>
+        </groupDatasource>
+    </dsContext>
+    <dialogMode height="600"
+                width="800"/>
+    <layout expand="organisationsTable"
+            spacing="true">
+        <filter id="filter"
+                applyTo="organisationsTable"
+                datasource="organisationsDs">
+            <properties include=".*"/>
+        </filter>
+        <groupTable id="organisationsTable"
+                    width="100%">
+            <actions>
+                <action id="create"/>
+                <action id="edit"/>
+                <action id="remove"/>
+            </actions>
+            <columns>
+                <column id="name"/>
+                <column id="address1"/>
+                <column id="address2"/>
+                <column id="city"/>
+                <column id="country"/>
+                <column id="postalCode"/>
+                <column id="email"/>
+                <column id="phone"/>
+                <column id="notes"/>
+                <column id="industry"/>
+            </columns>
+            <rows datasource="organisationsDs"/>
+            <rowsCount/>
+            <buttonsPanel id="buttonsPanel"
+                          alwaysVisible="true">
+                <button id="createBtn"
+                        action="organisationsTable.create"/>
+                <button id="editBtn"
+                        action="organisationsTable.edit"/>
+                <button id="removeBtn"
+                        action="organisationsTable.remove"/>
+            </buttonsPanel>
+        </groupTable>
+    </layout>
+</window>

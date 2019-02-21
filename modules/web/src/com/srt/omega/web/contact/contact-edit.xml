@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        caption="msg://editorCaption"
+        class="com.srt.omega.web.contact.ContactEdit"
+        datasource="contactDs"
+        focusComponent="fieldGroup"
+        messagesPack="com.srt.omega.web.contact">
+    <dsContext>
+        <datasource id="contactDs"
+                    class="com.srt.omega.entity.Contact"
+                    view="_local"/>
+    </dsContext>
+    <dialogMode height="600"
+                width="800"/>
+    <layout expand="windowActions"
+            spacing="true">
+        <fieldGroup id="fieldGroup"
+                    datasource="contactDs">
+            <column width="250px">
+                <field property="firstName"/>
+                <field property="lastName"/>
+                <field property="email"/>
+                <field property="phone"/>
+                <field property="jobTitle"/>
+                <field property="birthdate"/>
+                <field property="pdpa"/>
+                <field property="notes"/>
+            </column>
+        </fieldGroup>
+        <frame id="windowActions"
+               screen="editWindowActions"/>
+    </layout>
+</window>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        caption="msg://editorCaption"
+        class="com.srt.omega.web.showvenue.ShowVenueEdit"
+        datasource="showVenueDs"
+        focusComponent="fieldGroup"
+        messagesPack="com.srt.omega.web.showvenue">
+    <dsContext>
+        <datasource id="showVenueDs"
+                    class="com.srt.omega.entity.ShowVenue"
+                    view="_local"/>
+    </dsContext>
+    <dialogMode height="600"
+                width="800"/>
+    <layout expand="windowActions"
+            spacing="true">
+        <fieldGroup id="fieldGroup"
+                    datasource="showVenueDs">
+            <column width="250px">
+                <field property="name"/>
+                <field property="capacity"/>
+            </column>
+        </fieldGroup>
+        <frame id="windowActions"
+               screen="editWindowActions"/>
+    </layout>
+</window>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        caption="msg://editorCaption"
+        class="com.srt.omega.web.show.ShowEdit"
+        datasource="showDs"
+        focusComponent="fieldGroup"
+        messagesPack="com.srt.omega.web.show">
+    <dsContext>
+        <datasource id="showDs"
+                    class="com.srt.omega.entity.Show"
+                    view="show-view">
+            <collectionDatasource id="showTimingsDs"
+                                  property="showTimings"/>
+            <collectionDatasource id="ticketCategoriesDs"
+                                  property="ticketCategories"/>
+        </datasource>
+        <collectionDatasource id="showVenuesDs"
+                              class="com.srt.omega.entity.ShowVenue"
+                              view="_minimal">
+            <query>
+                <![CDATA[select e from omega$ShowVenue e]]>
+            </query>
+        </collectionDatasource>
+    </dsContext>
+    <dialogMode height="600"
+                width="800"/>
+    <layout expand="windowActions"
+            spacing="true">
+        <fieldGroup id="fieldGroup"
+                    datasource="showDs">
+            <column width="250px">
+                <field property="name"/>
+                <field property="code"/>
+                <field property="type"/>
+                <field property="startDate"/>
+                <field property="endDate"/>
+                <field optionsDatasource="showVenuesDs"
+                       property="showVenue"/>
+                <field property="status"/>
+                <field property="notes"/>
+            </column>
+        </fieldGroup>
+        <groupBox id="showTimingsBox"
+                  caption="msg://com.srt.omega.entity/Show.showTimings">
+            <table id="showTimingsTable"
+                   height="200px"
+                   width="100%">
+                <actions>
+                    <action id="create"/>
+                    <action id="edit"/>
+                    <action id="remove"/>
+                </actions>
+                <columns>
+                    <column id="showTime"/>
+                    <column id="notes"/>
+                </columns>
+                <rows datasource="showTimingsDs"/>
+                <buttonsPanel>
+                    <button action="showTimingsTable.create"/>
+                    <button action="showTimingsTable.edit"/>
+                    <button action="showTimingsTable.remove"/>
+                </buttonsPanel>
+            </table>
+        </groupBox>
+        <groupBox id="ticketCategoriesBox"
+                  caption="msg://com.srt.omega.entity/Show.ticketCategories">
+            <table id="ticketCategoriesTable"
+                   height="200px"
+                   width="100%">
+                <actions>
+                    <action id="create"/>
+                    <action id="edit"/>
+                    <action id="remove"/>
+                </actions>
+                <columns>
+                    <column id="categoryName"/>
+                    <column id="capacity"/>
+                    <column id="price"/>
+                </columns>
+                <rows datasource="ticketCategoriesDs"/>
+                <buttonsPanel>
+                    <button action="ticketCategoriesTable.create"/>
+                    <button action="ticketCategoriesTable.edit"/>
+                    <button action="ticketCategoriesTable.remove"/>
+                </buttonsPanel>
+            </table>
+        </groupBox>
+        <frame id="windowActions"
+               screen="editWindowActions"/>
+    </layout>
+</window>

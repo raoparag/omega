@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        caption="msg://editorCaption"
+        class="com.srt.omega.web.organisation.OrganisationEdit"
+        datasource="organisationDs"
+        focusComponent="fieldGroup"
+        messagesPack="com.srt.omega.web.organisation">
+    <dsContext>
+        <datasource id="organisationDs"
+                    class="com.srt.omega.entity.Organisation"
+                    view="organisation-view">
+            <collectionDatasource id="contactsDs"
+                                  property="contacts"/>
+        </datasource>
+        <collectionDatasource id="countriesDs"
+                              class="com.srt.omega.entity.Country"
+                              view="_minimal">
+            <query>
+                <![CDATA[select e from omega$Country e]]>
+            </query>
+        </collectionDatasource>
+        <collectionDatasource id="industriesDs"
+                              class="com.srt.omega.entity.Industry"
+                              view="_minimal">
+            <query>
+                <![CDATA[select e from omega$Industry e]]>
+            </query>
+        </collectionDatasource>
+    </dsContext>
+    <dialogMode height="600"
+                width="800"/>
+    <layout expand="scrollBox"
+            spacing="true">
+        <scrollBox id="scrollBox"
+                   spacing="true">
+            <fieldGroup id="fieldGroup"
+                        datasource="organisationDs">
+                <column width="250px">
+                    <field property="name"/>
+                    <field property="address1"/>
+                    <field property="address2"/>
+                    <field property="city"/>
+                    <field optionsDatasource="countriesDs"
+                           property="country"/>
+                    <field property="postalCode"/>
+                    <field property="email"/>
+                    <field property="phone"/>
+                    <field property="notes"/>
+                    <field optionsDatasource="industriesDs"
+                           property="industry"/>
+                </column>
+            </fieldGroup>
+            <groupBox id="contactsBox"
+                      caption="msg://com.srt.omega.entity/Organisation.contacts">
+                <table id="contactsTable"
+                       height="200px"
+                       width="100%">
+                    <actions>
+                        <action id="create"/>
+                        <action id="edit"/>
+                        <action id="remove"/>
+                    </actions>
+                    <columns>
+                        <column id="firstName"/>
+                        <column id="lastName"/>
+                        <column id="email"/>
+                        <column id="phone"/>
+                        <column id="jobTitle"/>
+                        <column id="birthdate"/>
+                        <column id="pdpa"/>
+                        <column id="notes"/>
+                    </columns>
+                    <rows datasource="contactsDs"/>
+                    <buttonsPanel>
+                        <button action="contactsTable.create"/>
+                        <button action="contactsTable.edit"/>
+                        <button action="contactsTable.remove"/>
+                    </buttonsPanel>
+                </table>
+            </groupBox>
+        </scrollBox>
+        <frame id="windowActions"
+               screen="editWindowActions"/>
+    </layout>
+</window>

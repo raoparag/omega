@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<fts-config xmlns="http://schemas.haulmont.com/cuba/fts.xsd">
+    <entities>
+        <entity class="com.srt.omega.entity.ShowVenue">
+            <include re=".*"/>
+        </entity>
+        <entity class="com.srt.omega.entity.Country">
+            <include re=".*"/>
+        </entity>
+        <entity class="com.srt.omega.entity.PaymentCategory">
+            <include re=".*"/>
+        </entity>
+        <entity class="com.srt.omega.entity.Contact">
+            <include re=".*"/>
+        </entity>
+        <entity class="com.srt.omega.entity.Organisation">
+            <include re=".*"/>
+        </entity>
+        <entity class="com.srt.omega.entity.Industry">
+            <include re=".*"/>
+        </entity>
+        <entity class="com.srt.omega.entity.ShowTiming">
+            <include re=".*"/>
+        </entity>
+        <entity class="com.srt.omega.entity.Show">
+            <include re=".*"/>
+        </entity>
+        <entity class="com.srt.omega.entity.TicketCategory">
+            <include re=".*"/>
+        </entity>
+        <entity class="com.srt.omega.entity.BookingItem">
+            <include re=".*"/>
+        </entity>
+        <entity class="com.srt.omega.entity.Booking">
+            <include re=".*"/>
+        </entity>
+    </entities>
+</fts-config>

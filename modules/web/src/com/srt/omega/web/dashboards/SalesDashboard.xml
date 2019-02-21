@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        caption="msg://caption"
+        class="com.srt.omega.web.dashboards.Salesdashboard"
+        messagesPack="com.srt.omega.web.dashboards"
+        xmlns:chart="http://schemas.haulmont.com/charts/charts.xsd">
+    <dsContext>
+        <collectionDatasource id="showsDs"
+                              class="com.srt.omega.entity.Show"
+                              view="show-view">
+            <query>
+                <![CDATA[select e from omega$Show e]]>
+            </query>
+        </collectionDatasource>
+        <valueCollectionDatasource id="salesByIndustryDs">
+            <query>
+                <![CDATA[select b.organisation.industry, sum(b.totalQuantity)
+from omega$Booking b
+where b.show.id = :ds$showsDs
+group by b.organisation.industry]]>
+            </query>
+            <properties>
+                <property class="com.srt.omega.entity.Booking"
+                          name="show"/>
+                <property datatype="decimal"
+                          name="sum"/>
+            </properties>
+        </valueCollectionDatasource>
+        <valueCollectionDatasource id="individualSalesDs">
+            <query>
+                <![CDATA[select b.organisation.name, sum(b.totalQuantity)
+from omega$Booking b
+where b.show.id = :ds$showsDs
+group by b.organisation.name]]>
+            </query>
+            <properties>
+                <property class="com.srt.omega.entity.Show"
+                          name="show"/>
+                <property datatype="decimal"
+                          name="sum"/>
+            </properties>
+        </valueCollectionDatasource>
+    </dsContext>
+    <dialogMode height="600"
+                width="800"/>
+    <layout expand="chartGrid"
+            spacing="true">
+        <lookupField id="showLookup"
+                     caption="Select Show"
+                     optionsDatasource="showsDs"
+                     width="400px"/>
+        <grid id="chartGrid"
+              align="MIDDLE_CENTER"
+              spacing="true">
+            <columns count="2"/>
+            <rows>
+                <row>
+                    <chart:pieChart id="salesByIndustry"
+                                    caption="Sales By Industry"
+                                    datasource="salesByIndustryDs"
+                                    titleField="show"
+                                    valueField="sum"/>
+                    <chart:pieChart id="individualSales"
+                                    caption="Sales By Organisation"
+                                    datasource="individualSalesDs"
+                                    titleField="show"
+                                    valueField="sum"/>
+                </row>
+            </rows>
+        </grid>
+    </layout>
+</window>

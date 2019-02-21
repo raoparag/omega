@@ -1,0 +1,24 @@
+<Context>
+    <!-- Database connection -->
+    <Resource driverClassName="com.mysql.cj.jdbc.Driver"
+              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              maxIdle="2"
+              maxTotal="20"
+              maxWaitMillis="5000"
+              name="jdbc/CubaDS"
+              password="srtcuba!123"
+              type="javax.sql.DataSource"
+              url="jdbc:mysql://aaxyt7r4umarh4.cm9pc4wp6v4c.ap-southeast-1.rds.amazonaws.com:3306/omega?useSSL=false&amp;allowMultiQueries=true&amp;allowPublicKeyRetrieval=true"
+              username="cuba"/>
+    <!-- Switch off session serialization -->
+    <Manager pathname=""/>
+    <!--<Resource driverClassName="org.hsqldb.jdbc.JDBCDriver"
+          maxIdle="2"
+          maxTotal="20"
+          maxWaitMillis="5000"
+          name="jdbc/CubaDS"
+          password=""
+          type="javax.sql.DataSource"
+          url="jdbc:hsqldb:hsql://localhost/omega"
+          username="sa"/>-->
+</Context>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        caption="msg://browseCaption"
+        class="com.srt.omega.web.bookingitem.BookingItemBrowse"
+        focusComponent="bookingItemsTable"
+        lookupComponent="bookingItemsTable"
+        messagesPack="com.srt.omega.web.bookingitem">
+    <dsContext>
+        <groupDatasource id="bookingItemsDs"
+                         class="com.srt.omega.entity.BookingItem"
+                         view="bookingItem-view">
+            <query>
+                <![CDATA[select e from omega$BookingItem e]]>
+            </query>
+        </groupDatasource>
+    </dsContext>
+    <dialogMode height="600"
+                width="800"/>
+    <layout expand="bookingItemsTable"
+            spacing="true">
+        <filter id="filter"
+                applyTo="bookingItemsTable"
+                datasource="bookingItemsDs">
+            <properties include=".*"/>
+        </filter>
+        <groupTable id="bookingItemsTable"
+                    width="100%">
+            <actions>
+                <action id="refresh"/>
+                <action id="excel"
+                        caption="Export"/>
+            </actions>
+            <columns>
+                <column id="showTiming"/>
+                <column id="ticketCategory"/>
+                <column id="quantity"/>
+                <column id="paymentCategory"/>
+                <column id="discount"/>
+                <column id="sisticFee"/>
+                <column id="seatDetails"/>
+                <column id="booking"/>
+            </columns>
+            <rows datasource="bookingItemsDs"/>
+            <rowsCount/>
+            <buttonsPanel id="buttonsPanel"
+                          alwaysVisible="true">
+                <button id="refresh"
+                        action="bookingItemsTable.refresh"/>
+                <button id="editBtn"
+                        action="bookingItemsTable.excel"
+                        caption="Export"/>
+            </buttonsPanel>
+        </groupTable>
+    </layout>
+</window>

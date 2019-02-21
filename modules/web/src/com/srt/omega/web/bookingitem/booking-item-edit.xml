@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        caption="msg://editorCaption"
+        class="com.srt.omega.web.bookingitem.BookingItemEdit"
+        datasource="bookingItemDs"
+        focusComponent="fieldGroup"
+        messagesPack="com.srt.omega.web.bookingitem">
+    <dsContext>
+        <datasource id="bookingItemDs"
+                    class="com.srt.omega.entity.BookingItem"
+                    view="bookingItem-view"/>
+        <collectionDatasource id="ticketCategoriesDs"
+                              class="com.srt.omega.entity.TicketCategory"
+                              view="_local">
+            <query>
+                <![CDATA[select e from omega$TicketCategory e]]>
+            </query>
+        </collectionDatasource>
+        <collectionDatasource id="paymentCategoriesDs"
+                              class="com.srt.omega.entity.PaymentCategory"
+                              view="_local">
+            <query>
+                <![CDATA[select e from omega$PaymentCategory e]]>
+            </query>
+        </collectionDatasource>
+        <collectionDatasource id="showTimingsDs"
+                              class="com.srt.omega.entity.ShowTiming"
+                              view="showTiming-view">
+            <query>
+                <![CDATA[select e from omega$ShowTiming e]]>
+            </query>
+        </collectionDatasource>
+    </dsContext>
+    <dialogMode height="600"
+                width="800"/>
+    <layout expand="windowActions"
+            spacing="true">
+        <fieldGroup id="fieldGroup"
+                    datasource="bookingItemDs">
+            <column width="250px">
+                <field optionsDatasource="showTimingsDs"
+                       property="showTiming"/>
+                <field optionsDatasource="ticketCategoriesDs"
+                       property="ticketCategory"/>
+                <field property="quantity"/>
+                <field optionsDatasource="paymentCategoriesDs"
+                       property="paymentCategory"/>
+                <field property="discount"/>
+                <field property="sisticFee"/>
+                <field property="seatDetails"
+                       rows="5"/>
+            </column>
+        </fieldGroup>
+        <frame id="windowActions"
+               screen="editWindowActions"/>
+    </layout>
+</window>
