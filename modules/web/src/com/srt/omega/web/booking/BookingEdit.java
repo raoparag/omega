@@ -1,6 +1,7 @@
 package com.srt.omega.web.booking;
 
 import com.haulmont.bali.util.ParamsMap;
+import com.haulmont.cuba.gui.Dialogs;
 import com.haulmont.cuba.gui.components.AbstractEditor;
 import com.haulmont.cuba.gui.components.Action;
 import com.haulmont.cuba.gui.components.DialogAction;
@@ -27,6 +28,8 @@ public class BookingEdit extends AbstractEditor<Booking> {
     private CreateAction bookingItemsTableCreate;
     @Named("bookingItemsTable.edit")
     private EditAction bookingItemsTableEdit;
+    @Inject
+    private Dialogs dialogs;
     private Logger logger = LoggerFactory.getLogger(BookingEdit.class);
 
     @Override
@@ -35,11 +38,10 @@ public class BookingEdit extends AbstractEditor<Booking> {
             if ((bookingItemsDs.size() > 0)
                     && (!bookingItemsDs.getItems().stream().findFirst().get().getShowTiming().getShow().getId()
                     .equals(getItem().getShow().getId()))) {
-                showOptionDialog(
-                        getMessage("confirmShowChangeForBooking.title"),
-                        getMessage("confirmShowChangeForBooking.msg"),
-                        MessageType.CONFIRMATION,
-                        new Action[]{
+                dialogs.createOptionDialog()
+                        .withCaption(getMessage("confirmShowChangeForBooking.title"))
+                        .withMessage(getMessage("confirmShowChangeForBooking.msg"))
+                        .withActions(
                                 new DialogAction(DialogAction.Type.YES, Action.Status.PRIMARY).withHandler(e -> {
                                     bookingItemsDs.clear();
                                     setShowParam();
@@ -47,8 +49,8 @@ public class BookingEdit extends AbstractEditor<Booking> {
                                 new DialogAction(DialogAction.Type.NO, Action.Status.NORMAL).withHandler(e -> {
                                     getItem().setShow(event.getPrevItem());
                                 })
-                        }
-                );
+                        )
+                        .show();
             } else
                 setShowParam();
         });

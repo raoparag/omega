@@ -16,7 +16,7 @@
             <query>
                 <![CDATA[select b.organisation.industry, sum(b.totalQuantity)
 from omega$Booking b
-where b.show.id = :ds$showsDs
+where b.show = :ds$showsDs
 group by b.organisation.industry]]>
             </query>
             <properties>
@@ -30,7 +30,7 @@ group by b.organisation.industry]]>
             <query>
                 <![CDATA[select b.organisation.name, sum(b.totalQuantity)
 from omega$Booking b
-where b.show.id = :ds$showsDs
+where b.show = :ds$showsDs
 group by b.organisation.name]]>
             </query>
             <properties>

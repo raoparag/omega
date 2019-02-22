@@ -556,8 +556,8 @@ public class SampleDataGenerator implements SampleDataGeneratorMBean {
                 contact.setOrganisation(organisationList.get(ThreadLocalRandom.current().nextInt(organisationList.size())));
                 contact.setFirstName(firstNames[ThreadLocalRandom.current().nextInt(firstNames.length)]);
                 contact.setLastName(lastNames[ThreadLocalRandom.current().nextInt(lastNames.length)]);
-                contact.setEmail(contact.getFirstName().substring(0, (contact.getFirstName().length() / 2))
-                        + contact.getLastName().substring(0, (contact.getLastName().length() / 2)) + "@gmail.com");
+                contact.setEmail(contact.getFirstName().substring(0, (contact.getFirstName().length() / 2)).toLowerCase()
+                        + contact.getLastName().substring(0, (contact.getLastName().length() / 2)).toLowerCase() + "@gmail.com");
                 contact.setPdpa(PDPA.fromId(ThreadLocalRandom.current().nextInt(1, 5) * 10));
                 contact.setJobTitle(RandomStringUtils.randomAlphabetic(10));
                 contact.setPhone(RandomStringUtils.randomNumeric(10));

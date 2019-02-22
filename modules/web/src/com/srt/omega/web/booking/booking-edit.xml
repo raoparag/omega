@@ -1,108 +1,59 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
-        caption="msg://editorCaption"
-        class="com.srt.omega.web.booking.BookingEdit"
-        datasource="bookingDs"
-        focusComponent="fieldGroup"
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd" caption="msg://editorCaption"
+        class="com.srt.omega.web.booking.BookingEdit" datasource="bookingDs" focusComponent="fieldGroup"
         messagesPack="com.srt.omega.web.booking">
     <dsContext>
-        <datasource id="bookingDs"
-                    class="com.srt.omega.entity.Booking"
-                    view="booking-view">
-            <collectionDatasource id="bookingItemsDs"
-                                  property="bookingItems"/>
+        <datasource id="bookingDs" class="com.srt.omega.entity.Booking" view="booking-view">
+            <collectionDatasource id="bookingItemsDs" property="bookingItems"/>
         </datasource>
-        <collectionDatasource id="showsDs"
-                              class="com.srt.omega.entity.Show"
-                              view="_minimal">
-            <query>
-                <![CDATA[select e from omega$Show e]]>
-            </query>
+        <collectionDatasource id="showsDs" class="com.srt.omega.entity.Show" view="_minimal">
+            <query><![CDATA[select e from omega$Show e]]></query>
         </collectionDatasource>
-        <collectionDatasource id="organisationsDs"
-                              class="com.srt.omega.entity.Organisation"
-                              view="_minimal">
-            <query>
-                <![CDATA[select e from omega$Organisation e]]>
-            </query>
+        <collectionDatasource id="organisationsDs" class="com.srt.omega.entity.Organisation" view="_minimal">
+            <query><![CDATA[select e from omega$Organisation e]]></query>
         </collectionDatasource>
-        <collectionDatasource id="srtContactsDs"
-                              class="com.srt.omega.entity.Contact"
-                              view="_minimal">
+        <collectionDatasource id="srtContactsDs" class="com.srt.omega.entity.Contact" view="_minimal">
             <query>
-                <![CDATA[select e from omega$Contact e join omega$Organisation o on e.organisation.id=o.id where e.organisation.name='SRT']]>
-            </query>
+                <![CDATA[select e from omega$Contact e join omega$Organisation o on e.organisation.id=o.id where e.organisation.name='SRT']]></query>
         </collectionDatasource>
-        <collectionDatasource id="orgContactsDs"
-                              class="com.srt.omega.entity.Contact"
-                              view="_minimal">
-            <query>
-                <![CDATA[select e from omega$Contact e
-where e.organisation.id = :ds$organisationsDs]]>
-            </query>
+        <collectionDatasource id="orgContactsDs" class="com.srt.omega.entity.Contact" view="_minimal">
+            <query><![CDATA[select e from omega$Contact e
+where e.organisation = :ds$organisationsDs]]></query>
         </collectionDatasource>
     </dsContext>
-    <dialogMode height="600"
-                width="800"/>
-    <layout expand="scrollBox"
-            spacing="true">
-        <scrollBox id="scrollBox"
-                   spacing="true">
-            <fieldGroup id="fieldGroup"
-                        datasource="bookingDs">
+    <dialogMode height="600" width="800"/>
+    <layout expand="scrollBox" spacing="true">
+        <scrollBox id="scrollBox" spacing="true">
+            <fieldGroup id="fieldGroup" datasource="bookingDs">
                 <column width="250px">
-                    <field caption="Organisation"
-                           optionsDatasource="organisationsDs"
-                           property="organisation"/>
-                    <field caption="Org Contact"
-                           optionsDatasource="orgContactsDs"
-                           property="orgContact"/>
-                    <field optionsDatasource="showsDs"
-                           property="show"/>
+                    <field caption="Organisation" optionsDatasource="organisationsDs" property="organisation"/>
+                    <field caption="Org Contact" optionsDatasource="orgContactsDs" property="orgContact"/>
+                    <field optionsDatasource="showsDs" property="show"/>
                     <field property="bookingStatus"/>
                     <field property="ticketStatus"/>
-                    <field caption="Total Quantity"
-                           editable="false"
-                           property="totalQuantity"/>
-                    <field caption="Total Price"
-                           editable="false"
-                           property="totalPrice"/>
+                    <field caption="Total Quantity" editable="false" property="totalQuantity"/>
+                    <field caption="Total Price" editable="false" property="totalPrice"/>
                     <field property="paymentMethod"/>
-                    <field editable="false"
-                           property="bookingConfirmationNumber"/>
-                    <field caption="SRT Contact"
-                           optionsDatasource="srtContactsDs"
-                           property="srtContact"/>
-                    <field property="notes"
-                           rows="5"/>
+                    <field editable="false" property="bookingConfirmationNumber"/>
+                    <field caption="SRT Contact" optionsDatasource="srtContactsDs" property="srtContact"/>
+                    <field property="notes" rows="5"/>
                 </column>
             </fieldGroup>
-            <groupBox id="bookingItemsBox"
-                      caption="msg://com.srt.omega.entity/Booking.bookingItems">
-                <table id="bookingItemsTable"
-                       editable="true"
-                       height="200px"
-                       multiselect="true"
-                       responsive="true"
+            <groupBox id="bookingItemsBox" caption="msg://com.srt.omega.entity/Booking.bookingItems">
+                <table id="bookingItemsTable" editable="true" height="200px" multiselect="true" responsive="true"
                        width="100%">
                     <actions>
-                        <action id="create"
-                                caption="Create"/>
-                        <action id="edit"
-                                caption="Edit"/>
+                        <action id="create" caption="Create"/>
+                        <action id="edit" caption="Edit"/>
                         <action id="remove"/>
                         <action id="excel"/>
                     </actions>
                     <columns>
-                        <column id="quantity"
-                                editable="true"/>
+                        <column id="quantity" editable="true"/>
                         <column id="paymentCategory"/>
-                        <column id="discount"
-                                editable="true"/>
-                        <column id="sisticFee"
-                                editable="true"/>
-                        <column id="seatDetails"
-                                editable="true"/>
+                        <column id="discount" editable="true"/>
+                        <column id="sisticFee" editable="true"/>
+                        <column id="seatDetails" editable="true"/>
                         <column id="ticketCategory"/>
                         <column id="showTiming"/>
                     </columns>
@@ -111,14 +62,11 @@ where e.organisation.id = :ds$organisationsDs]]>
                         <button action="bookingItemsTable.create"/>
                         <button action="bookingItemsTable.edit"/>
                         <button action="bookingItemsTable.remove"/>
-                        <button id="export"
-                                action="bookingItemsTable.excel"
-                                caption="Export"/>
+                        <button id="export" action="bookingItemsTable.excel" caption="Export"/>
                     </buttonsPanel>
                 </table>
             </groupBox>
         </scrollBox>
-        <frame id="windowActions"
-               screen="editWindowActions"/>
+        <frame id="windowActions" screen="editWindowActions"/>
     </layout>
 </window>

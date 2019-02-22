@@ -1,14 +1,10 @@
 
 buildscript {
-    ext.cubaVersion = '6.10.7'
+    ext.cubaVersion = '7.0.1'
     repositories {
-        
+
         maven {
-            url 'https://repo.cuba-platform.com/content/groups/work'
-            credentials {
-                username(rootProject.hasProperty('repoUser') ? rootProject['repoUser'] : 'cuba')
-                password(rootProject.hasProperty('repoPass') ? rootProject['repoPass'] : 'cuba123')
-            }
+            url 'https://dl.bintray.com/cuba-platform/main'
         }
         maven {
             url 'https://repo.cuba-platform.com/content/groups/premium'
@@ -17,8 +13,13 @@ buildscript {
                 password(rootProject.hasProperty('premiumRepoPass') ? rootProject['premiumRepoPass'] : 'U9Q6kAzkVbtj')
             }
         }
-        
-    }
+
+        mavenCentral()
+        jcenter()
+        maven {
+            url 'http://maven.vaadin.com/vaadin-addons'
+        }
+}
     dependencies {
         classpath "com.haulmont.gradle:cuba-plugin:$cubaVersion"
     }
@@ -29,12 +30,10 @@ def modulePrefix = 'omega'
 def globalModule = project(":${modulePrefix}-global")
 def coreModule = project(":${modulePrefix}-core")
 def webModule = project(":${modulePrefix}-web")
-def webThemesModule = project(":${modulePrefix}-web-themes")
 
 def servletApi = 'javax.servlet:javax.servlet-api:3.1.0'
 
 
-apply(plugin: 'idea')
 apply(plugin: 'cuba')
 
 cuba {
@@ -61,7 +60,6 @@ def mysql = 'mysql:mysql-connector-java:5.1.46'
 configure([globalModule, coreModule, webModule]) {
     apply(plugin: 'java')
     apply(plugin: 'maven')
-    apply(plugin: 'idea')
     apply(plugin: 'cuba')
 
     dependencies {
@@ -79,6 +77,12 @@ configure([globalModule, coreModule, webModule]) {
 }
 
 configure(globalModule) {
+    dependencies {
+        if (!JavaVersion.current().isJava8()) {
+            runtime('javax.xml.bind:jaxb-api:2.3.1')
+            runtime('org.glassfish.jaxb:jaxb-runtime:2.3.1')
+        }
+    }
     entitiesEnhancing {
         main {
             enabled = true
@@ -97,7 +101,7 @@ configure(coreModule) {
 
     dependencies {
         compile(globalModule)
-        provided(servletApi)
+        compileOnly(servletApi)
         jdbc(mysql)
         testRuntime(mysql)
 
@@ -144,7 +148,7 @@ configure(webModule) {
     }
 
     dependencies {
-        provided(servletApi)
+        compileOnly(servletApi)
         compile(globalModule)
 
     }
@@ -188,31 +192,16 @@ configure(webModule) {
     task buildScssThemes(type: CubaWebScssThemeCreation)
     task deployThemes(type: CubaDeployThemeTask, dependsOn: buildScssThemes)
     assemble.dependsOn buildScssThemes
-}
 
-configure(webThemesModule) {
-    apply(plugin: 'java')
-    apply(plugin: 'maven')
-    apply(plugin: 'cuba')
+    task themesJar(type: Jar) {
+        from file('themes')
+        classifier = 'themes'
+    }
 
-    appModuleType = 'web-themes'
-
-    buildDir = file('../build/scss-themes')
-
-    sourceSets {
-        main {
-            java {
-                srcDir '.'
-            }
-            resources {
-                srcDir '.'
-            }
-        }
+    artifacts {
+        archives themesJar
     }
 }
-
-
-
 
 
 task undeploy(type: Delete, dependsOn: ":${modulePrefix}-web:cleanConf") {
@@ -232,9 +221,6 @@ task restart(dependsOn: ['stop', ":${modulePrefix}-core:deploy", ":${modulePrefi
     }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.3.1'
-}
 
 task buildWar(type: CubaWarBuilding) {
     appHome = '${catalina.base}/work'

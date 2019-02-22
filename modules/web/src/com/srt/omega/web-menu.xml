@@ -5,7 +5,6 @@
         <item screen="omega$ShowVenue.browse"/>
         <item screen="omega$Show.browse"/>
         <item screen="omega$Booking.browse"/>
-        <item screen="omega$BookingItem.browse"/>
     </menu>
     <menu id="Organisation"
           insertBefore="administration">
@@ -21,5 +20,6 @@
     <menu id="Dashboards"
           insertAfter="reports">
         <item screen="SalesDashboard"/>
+        <item screen="omega$BookingItem.browse"/>
     </menu>
 </menu-config>
