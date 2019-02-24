@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/screen/window.xsd" caption="msg://caption"
+        messagesPack="com.srt.omega.web.bulkAdd">
+    <layout spacing="true">
+        <textArea id="data" align="MIDDLE_CENTER" rows="10"/>
+        <buttonsPanel align="MIDDLE_CENTER">
+            <button id="add" caption="Add" invoke="add"/>
+            <button id="cancel" caption="Cancel" invoke="cancel"/>
+        </buttonsPanel>
+    </layout>
+</window>
