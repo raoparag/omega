@@ -26,7 +26,7 @@
             </column>
         </fieldGroup>
         <groupBox id="showTimingsBox" caption="msg://com.srt.omega.entity/Show.showTimings">
-            <table id="showTimingsTable" height="200px" width="100%">
+            <table id="showTimingsTable" height="200px" width="100%" multiselect="true">
                 <actions>
                     <action id="create"/>
                     <action id="edit"/>
@@ -41,11 +41,12 @@
                     <button action="showTimingsTable.create"/>
                     <button action="showTimingsTable.edit"/>
                     <button action="showTimingsTable.remove"/>
+                    <button id="bulkAddShowTiming" invoke="onBulkAddShowTiming" caption="Bulk Add"/>
                 </buttonsPanel>
             </table>
         </groupBox>
         <groupBox id="ticketCategoriesBox" caption="msg://com.srt.omega.entity/Show.ticketCategories">
-            <table id="ticketCategoriesTable" height="200px" width="100%">
+            <table id="ticketCategoriesTable" height="200px" width="100%" multiselect="true">
                 <actions>
                     <action id="create"/>
                     <action id="edit"/>
@@ -61,7 +62,7 @@
                     <button action="ticketCategoriesTable.create"/>
                     <button action="ticketCategoriesTable.edit"/>
                     <button action="ticketCategoriesTable.remove"/>
-                    <button id="bulkAddTicketCategory" invoke="onBulkAdd" caption="Bulk Add"/>
+                    <button id="bulkAddTicketCategory" invoke="onBulkAddTicketCategory" caption="Bulk Add"/>
                 </buttonsPanel>
             </table>
         </groupBox>

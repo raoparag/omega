@@ -16,7 +16,9 @@ import javax.inject.Inject;
 public class BulkAddScreen extends Screen {
 
     @Inject
-    public TextArea<String> data;
+    private TextArea<String> data;
+
+    private String type;
 
     @Inject
     private Events events;
@@ -26,7 +28,23 @@ public class BulkAddScreen extends Screen {
     }
 
     public void add() {
-        events.publish(new BulkAddEvent(""));
+        events.publish(new BulkAddEvent(this));
         closeWithDefaultAction();
+    }
+
+    public TextArea<String> getData() {
+        return data;
+    }
+
+    public void setData(TextArea<String> data) {
+        this.data = data;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
