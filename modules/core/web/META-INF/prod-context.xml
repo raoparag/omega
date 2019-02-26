@@ -1,6 +1,6 @@
 <Context>
     <!-- Database connection -->
-    <Resource driverClassName="com.mysql.cj.jdbc.Driver"
+    <Resource driverClassName="com.mysql.jdbc.Driver"
               factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
               maxIdle="2"
               maxTotal="20"
