@@ -1,25 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <menu-config xmlns="http://schemas.haulmont.com/cuba/menu.xsd">
-    <menu id="application-omega"
-          insertBefore="administration">
+    <menu id="Dashboards" insertAfter="reports">
+        <item screen="SalesDashboard"/>
+        <item screen="omega$BookingItem.browse"/>
+    </menu>
+    <menu id="application-omega" insertBefore="administration">
         <item screen="omega$ShowVenue.browse"/>
         <item screen="omega$Show.browse"/>
         <item screen="omega$Booking.browse"/>
     </menu>
-    <menu id="Organisation"
-          insertBefore="administration">
+    <menu id="Organisation" insertBefore="administration">
         <item screen="omega$Organisation.browse"/>
         <item screen="omega$Contact.browse"/>
     </menu>
-    <menu id="Setup"
-          insertBefore="administration">
+    <menu id="Setup" insertBefore="administration">
         <item screen="omega$Country.browse"/>
         <item screen="omega$Industry.browse"/>
         <item screen="omega$PaymentCategory.browse"/>
-    </menu>
-    <menu id="Dashboards"
-          insertAfter="reports">
-        <item screen="SalesDashboard"/>
-        <item screen="omega$BookingItem.browse"/>
     </menu>
 </menu-config>
