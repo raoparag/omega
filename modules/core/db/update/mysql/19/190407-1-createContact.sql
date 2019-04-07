@@ -1,4 +1,4 @@
-create table OMEGA_PAYMENT_CATEGORY (
+create table OMEGA_CONTACT (
     ID varchar(32),
     VERSION integer not null,
     CREATE_TS datetime(3),
@@ -8,8 +8,15 @@ create table OMEGA_PAYMENT_CATEGORY (
     DELETE_TS datetime(3),
     DELETED_BY varchar(50),
     --
-    NAME varchar(100),
+    FIRST_NAME varchar(100),
+    LAST_NAME varchar(100),
+    EMAIL varchar(150),
+    PHONE varchar(50),
+    JOB_TITLE varchar(150),
+    BIRTHDATE date,
+    PDPA integer,
     NOTES varchar(255),
+    ORGANISATION_ID varchar(32),
     --
     primary key (ID)
 );

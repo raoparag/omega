@@ -11,7 +11,7 @@
         </property>
         <property name="bookingItems"
                   view="_minimal">
-            <property name="quantity"/>
+            <property name="paidTickets"/>
             <property name="comps"/>
             <property name="paymentCategory"
                       view="_minimal"/>
@@ -67,7 +67,8 @@
             </property>
             <property name="bookingStatus"/>
             <property name="ticketStatus"/>
-            <property name="totalQuantity"/>
+            <property name="totalPaidTickets"/>
+            <property name="totalComps"/>
             <property name="totalPrice"/>
             <property name="paymentMethod"/>
             <property name="srtContact"

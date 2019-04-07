@@ -1,4 +1,4 @@
-create table OMEGA_SHOW (
+create table OMEGA_SHOW_TIMING (
     ID varchar(32),
     VERSION integer not null,
     CREATE_TS datetime(3),
@@ -8,14 +8,9 @@ create table OMEGA_SHOW (
     DELETE_TS datetime(3),
     DELETED_BY varchar(50),
     --
-    NAME varchar(255),
-    CODE varchar(3),
-    TYPE_ integer,
-    START_DATE date,
-    END_DATE date,
-    SHOW_VENUE_ID varchar(32),
-    STATUS integer,
+    SHOW_TIME datetime(3),
     NOTES varchar(255),
+    SHOW_ID varchar(32),
     --
     primary key (ID)
 );

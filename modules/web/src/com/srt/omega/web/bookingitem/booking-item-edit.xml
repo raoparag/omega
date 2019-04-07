@@ -41,7 +41,7 @@
                 <field property="showTiming" optionsDatasource="showTimingsDs"/>
                 <field property="ticketCategory" optionsDatasource="ticketCategoriesDs"/>
                 <field property="paymentCategory" optionsDatasource="paymentCategoriesDs"/>
-                <field property="quantity"/>
+                <field property="paidTickets"/>
                 <field property="comps"/>
                 <field property="discount"/>
                 <field property="sisticFee"/>

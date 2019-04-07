@@ -14,7 +14,7 @@
         </collectionDatasource>
         <valueCollectionDatasource id="salesByIndustryDs">
             <query>
-                <![CDATA[select b.organisation.industry, sum(b.totalQuantity)
+                <![CDATA[select b.organisation.industry, sum(b.totalPaidTickets)
 from omega$Booking b
 where b.show = :ds$showsDs
 group by b.organisation.industry]]>
@@ -28,7 +28,7 @@ group by b.organisation.industry]]>
         </valueCollectionDatasource>
         <valueCollectionDatasource id="individualSalesDs">
             <query>
-                <![CDATA[select b.organisation.name, sum(b.totalQuantity)
+                <![CDATA[select b.organisation.name, sum(b.totalPaidTickets)
 from omega$Booking b
 where b.show = :ds$showsDs
 group by b.organisation.name]]>

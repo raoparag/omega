@@ -28,8 +28,8 @@ public class BookingItem extends StandardEntity {
     @JoinColumn(name = "TICKET_CATEGORY_ID")
     protected TicketCategory ticketCategory;
 
-    @Column(name = "QUANTITY")
-    protected Integer quantity;
+    @Column(name = "PAID_TICKETS")
+    protected Integer paidTickets;
 
     @Column(name = "COMPS")
     protected Integer comps;
@@ -51,6 +51,14 @@ public class BookingItem extends StandardEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BOOKING_ID")
     protected Booking booking;
+
+    public Integer getPaidTickets() {
+        return paidTickets;
+    }
+
+    public void setPaidTickets(Integer paidTickets) {
+        this.paidTickets = paidTickets;
+    }
 
     public Integer getComps() {
         return comps;
@@ -83,14 +91,6 @@ public class BookingItem extends StandardEntity {
 
     public TicketCategory getTicketCategory() {
         return ticketCategory;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
     }
 
     public void setPaymentCategory(PaymentCategory paymentCategory) {

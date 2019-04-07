@@ -37,7 +37,8 @@
                 <column id="show"/>
                 <column id="bookingStatus"/>
                 <column id="ticketStatus"/>
-                <column id="totalQuantity"/>
+                <column id="totalPaidTickets"/>
+                <column id="totalComps"/>
                 <column id="totalPrice"/>
                 <column id="paymentMethod"/>
                 <column id="bookingConfirmationNumber"/>

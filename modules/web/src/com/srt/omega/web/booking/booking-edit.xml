@@ -31,7 +31,8 @@ where e.organisation = :ds$organisationsDs]]></query>
                     <field optionsDatasource="showsDs" property="show"/>
                     <field property="bookingStatus"/>
                     <field property="ticketStatus"/>
-                    <field caption="Total Quantity" editable="false" property="totalQuantity"/>
+                    <field caption="Total Paid Tickets" editable="false" property="totalPaidTickets"/>
+                    <field caption="Total Comps" editable="false" property="totalComps"/>
                     <field caption="Total Price" editable="false" property="totalPrice"/>
                     <field property="paymentMethod"/>
                     <field editable="false" property="bookingConfirmationNumber"/>
@@ -52,7 +53,7 @@ where e.organisation = :ds$organisationsDs]]></query>
                         <column id="showTiming"/>
                         <column id="ticketCategory"/>
                         <column id="paymentCategory"/>
-                        <column id="quantity" editable="true"/>
+                        <column id="paidTickets" editable="true"/>
                         <column id="comps" editable="true"/>
                         <column id="discount" editable="true"/>
                         <column id="sisticFee" editable="true"/>

@@ -46,8 +46,11 @@ public class Booking extends StandardEntity {
     @Column(name = "TICKET_STATUS")
     protected Integer ticketStatus;
 
-    @Column(name = "TOTAL_QUANTITY")
-    protected Integer totalQuantity;
+    @Column(name = "TOTAL_PAID_TICKETS")
+    protected Integer totalPaidTickets;
+
+    @Column(name = "TOTAL_COMPS")
+    protected Integer totalComps;
 
     @Column(name = "TOTAL_PRICE")
     protected Double totalPrice;
@@ -70,6 +73,14 @@ public class Booking extends StandardEntity {
 
     @Column(name = "NOTES")
     protected String notes;
+
+    public Integer getTotalComps() {
+        return totalComps;
+    }
+
+    public void setTotalComps(Integer totalComps) {
+        this.totalComps = totalComps;
+    }
 
     public void setOrganisation(Organisation organisation) {
         this.organisation = organisation;
@@ -111,12 +122,12 @@ public class Booking extends StandardEntity {
         return ticketStatus == null ? null : TicketStatus.fromId(ticketStatus);
     }
 
-    public void setTotalQuantity(Integer totalQuantity) {
-        this.totalQuantity = totalQuantity;
+    public void setTotalPaidTickets(Integer totalPaidTickets) {
+        this.totalPaidTickets = totalPaidTickets;
     }
 
-    public Integer getTotalQuantity() {
-        return totalQuantity;
+    public Integer getTotalPaidTickets() {
+        return totalPaidTickets;
     }
 
     public void setTotalPrice(Double totalPrice) {

@@ -56,7 +56,7 @@ public class BookingEdit extends AbstractEditor<Booking> {
         });
         bookingItemsDs.addCollectionChangeListener(event -> calculateTotals());
         bookingItemsDs.addItemPropertyChangeListener(event -> {
-            if (event.getProperty().equalsIgnoreCase("quantity")
+            if (event.getProperty().equalsIgnoreCase("paidTickets")
                     || event.getProperty().equalsIgnoreCase("discount")
                     || event.getProperty().equalsIgnoreCase("sisticFee")
                     || event.getProperty().equalsIgnoreCase("ticketCategory"))
@@ -65,12 +65,14 @@ public class BookingEdit extends AbstractEditor<Booking> {
     }
 
     private void calculateTotals() {
-        int totalQuantity = bookingItemsDs.getItems().parallelStream().mapToInt(BookingItem::getQuantity).sum();
-        getItem().setTotalQuantity(totalQuantity);
+        int totalPaidTickets = bookingItemsDs.getItems().parallelStream().mapToInt(BookingItem::getPaidTickets).sum();
+        getItem().setTotalPaidTickets(totalPaidTickets);
+        int totalComps = bookingItemsDs.getItems().parallelStream().mapToInt(BookingItem::getComps).sum();
+        getItem().setTotalComps(totalComps);
         double totalAmount = 0;
         for (BookingItem item : bookingItemsDs.getItems()) {
-            totalAmount = totalAmount + (item.getQuantity() * (item.getTicketCategory().getPrice() + item.getSisticFee()));
-            totalAmount = totalAmount - (item.getDiscount() / 100 * item.getQuantity() * item.getTicketCategory().getPrice());
+            totalAmount = totalAmount + (item.getPaidTickets() * (item.getTicketCategory().getPrice() + item.getSisticFee()));
+            totalAmount = totalAmount - (item.getDiscount() / 100 * item.getPaidTickets() * item.getTicketCategory().getPrice());
         }
         getItem().setTotalPrice(totalAmount);
     }
