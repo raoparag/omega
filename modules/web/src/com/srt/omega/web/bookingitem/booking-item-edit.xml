@@ -38,17 +38,14 @@
         <fieldGroup id="fieldGroup"
                     datasource="bookingItemDs">
             <column width="250px">
-                <field optionsDatasource="showTimingsDs"
-                       property="showTiming"/>
-                <field optionsDatasource="ticketCategoriesDs"
-                       property="ticketCategory"/>
+                <field property="showTiming" optionsDatasource="showTimingsDs"/>
+                <field property="ticketCategory" optionsDatasource="ticketCategoriesDs"/>
+                <field property="paymentCategory" optionsDatasource="paymentCategoriesDs"/>
                 <field property="quantity"/>
-                <field optionsDatasource="paymentCategoriesDs"
-                       property="paymentCategory"/>
+                <field property="comps"/>
                 <field property="discount"/>
                 <field property="sisticFee"/>
-                <field property="seatDetails"
-                       rows="5"/>
+                <field property="seatDetails" rows="5"/>
             </column>
         </fieldGroup>
         <frame id="windowActions"

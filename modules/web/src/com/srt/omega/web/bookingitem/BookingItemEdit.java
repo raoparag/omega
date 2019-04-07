@@ -24,9 +24,9 @@ public class BookingItemEdit extends AbstractEditor<BookingItem> {
     public void init(Map<String, Object> params) {
         if (show != null) {
             showTimingsDs.setQuery(
-                    "select e from omega$ShowTiming e where e.show.id = :param$show");
+                    "select e from omega$ShowTiming e where e.show = :param$show");
             ticketCategoriesDs.setQuery(
-                    "select e from omega$TicketCategory e where e.show.id = :param$show");
+                    "select e from omega$TicketCategory e where e.show = :param$show");
         }
     }
 }

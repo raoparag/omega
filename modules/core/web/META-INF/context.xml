@@ -7,7 +7,7 @@
               name="jdbc/CubaDS"
               password="srtcuba!123"
               type="javax.sql.DataSource"
-              url="jdbc:mysql://localhost/omega?useSSL=false&amp;allowMultiQueries=true&amp;allowPublicKeyRetrieval=true"
+              url="jdbc:mysql://localhost/omega?useSSL=false&amp;allowMultiQueries=true&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true"
               username="cuba"/>
     <!-- Switch off session serialization -->
     <Manager pathname=""/>

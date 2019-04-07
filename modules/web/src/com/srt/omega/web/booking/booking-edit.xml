@@ -49,13 +49,14 @@ where e.organisation = :ds$organisationsDs]]></query>
                         <action id="excel"/>
                     </actions>
                     <columns>
-                        <column id="quantity" editable="true"/>
+                        <column id="showTiming"/>
+                        <column id="ticketCategory"/>
                         <column id="paymentCategory"/>
+                        <column id="quantity" editable="true"/>
+                        <column id="comps" editable="true"/>
                         <column id="discount" editable="true"/>
                         <column id="sisticFee" editable="true"/>
                         <column id="seatDetails" editable="true"/>
-                        <column id="ticketCategory"/>
-                        <column id="showTiming"/>
                     </columns>
                     <rows datasource="bookingItemsDs"/>
                     <buttonsPanel>

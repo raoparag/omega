@@ -12,6 +12,7 @@
         <property name="bookingItems"
                   view="_minimal">
             <property name="quantity"/>
+            <property name="comps"/>
             <property name="paymentCategory"
                       view="_minimal"/>
             <property name="discount"/>

@@ -1,17 +1,10 @@
 
 buildscript {
-    ext.cubaVersion = '7.0.1'
+    ext.cubaVersion = '7.0.3'
     repositories {
 
         maven {
             url 'https://dl.bintray.com/cuba-platform/main'
-        }
-        maven {
-            url 'https://repo.cuba-platform.com/content/groups/premium'
-            credentials {
-                username(rootProject.hasProperty('premiumRepoUser') ? rootProject['premiumRepoUser'] : '190207002603')
-                password(rootProject.hasProperty('premiumRepoPass') ? rootProject['premiumRepoPass'] : 'U9Q6kAzkVbtj')
-            }
         }
 
         mavenCentral()
@@ -124,21 +117,21 @@ configure(coreModule) {
     }
 
     task createDb(dependsOn: assembleDbScripts, description: 'Creates local database', type: CubaDbCreation) {
-        connectionParams = '?useSSL=false&allowMultiQueries=true&allowPublicKeyRetrieval=true'
         dbms = 'mysql'
         host = 'localhost'
         dbName = 'omega'
         dbUser = 'cuba'
         dbPassword = 'srtcuba!123'
+        connectionParams = '?useSSL=false&allowMultiQueries=true&serverTimezone=UTC&allowPublicKeyRetrieval=true'
     }
 
     task updateDb(dependsOn: assembleDbScripts, description: 'Updates local database', type: CubaDbUpdate) {
-        connectionParams = '?useSSL=false&allowMultiQueries=true&allowPublicKeyRetrieval=true'
         dbms = 'mysql'
         host = 'localhost'
         dbName = 'omega'
         dbUser = 'cuba'
         dbPassword = 'srtcuba!123'
+        connectionParams = '?useSSL=false&allowMultiQueries=true&serverTimezone=UTC&allowPublicKeyRetrieval=true'
     }
 }
     

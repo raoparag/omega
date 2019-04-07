@@ -187,6 +187,7 @@ create table OMEGA_BOOKING_ITEM (
     SHOW_TIMING_ID varchar(36),
     TICKET_CATEGORY_ID varchar(36),
     QUANTITY integer,
+    COMPS integer,
     PAYMENT_CATEGORY_ID varchar(36),
     DISCOUNT double precision,
     SISTIC_FEE double precision,
