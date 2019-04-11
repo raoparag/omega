@@ -1,4 +1,4 @@
-create table OMEGA_TICKET_CATEGORY (
+create table OMEGA_PAYMENT_CATEGORY (
     ID varchar(32),
     VERSION integer not null,
     CREATE_TS datetime(3),
@@ -8,10 +8,8 @@ create table OMEGA_TICKET_CATEGORY (
     DELETE_TS datetime(3),
     DELETED_BY varchar(50),
     --
-    CATEGORY_NAME varchar(50),
-    CAPACITY integer,
-    PRICE double precision,
-    SHOW_ID varchar(32),
+    NAME varchar(100),
+    NOTES varchar(255),
     --
     primary key (ID)
 );

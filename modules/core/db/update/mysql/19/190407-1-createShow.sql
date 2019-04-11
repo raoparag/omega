@@ -1,4 +1,4 @@
-create table OMEGA_ORGANISATION (
+create table OMEGA_SHOW (
     ID varchar(32),
     VERSION integer not null,
     CREATE_TS datetime(3),
@@ -9,15 +9,13 @@ create table OMEGA_ORGANISATION (
     DELETED_BY varchar(50),
     --
     NAME varchar(255),
-    ADDRESS1 varchar(255),
-    ADDRESS2 varchar(255),
-    CITY varchar(150),
-    COUNTRY_ID varchar(32),
-    POSTAL_CODE varchar(10),
-    EMAIL varchar(100),
-    PHONE varchar(50),
+    CODE varchar(3),
+    TYPE_ integer,
+    START_DATE date,
+    END_DATE date,
+    SHOW_VENUE_ID varchar(32),
+    STATUS integer,
     NOTES varchar(255),
-    INDUSTRY_ID varchar(32),
     --
     primary key (ID)
 );

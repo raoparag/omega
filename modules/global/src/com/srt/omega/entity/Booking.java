@@ -1,21 +1,22 @@
 package com.srt.omega.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import com.haulmont.chile.core.annotations.Composition;
+import com.haulmont.chile.core.annotations.NamePattern;
+import com.haulmont.cuba.core.entity.StandardEntity;
+import com.haulmont.cuba.core.entity.annotation.Listeners;
 import com.haulmont.cuba.core.entity.annotation.Lookup;
 import com.haulmont.cuba.core.entity.annotation.LookupType;
 import com.haulmont.cuba.core.entity.annotation.OnDelete;
 import com.haulmont.cuba.core.global.DeletePolicy;
-import java.util.List;
+
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import com.haulmont.cuba.core.entity.StandardEntity;
-import com.haulmont.chile.core.annotations.NamePattern;
-import com.haulmont.cuba.core.entity.annotation.Listeners;
+import javax.persistence.Table;
+import java.util.List;
 
 @Listeners("omega_BookingEntityListener")
 @NamePattern("%s|bookingConfirmationNumber")
@@ -45,8 +46,11 @@ public class Booking extends StandardEntity {
     @Column(name = "TICKET_STATUS")
     protected Integer ticketStatus;
 
-    @Column(name = "TOTAL_QUANTITY")
-    protected Integer totalQuantity;
+    @Column(name = "TOTAL_PAID_TICKETS")
+    protected Integer totalPaidTickets;
+
+    @Column(name = "TOTAL_COMPS")
+    protected Integer totalComps;
 
     @Column(name = "TOTAL_PRICE")
     protected Double totalPrice;
@@ -69,6 +73,14 @@ public class Booking extends StandardEntity {
 
     @Column(name = "NOTES")
     protected String notes;
+
+    public Integer getTotalComps() {
+        return totalComps;
+    }
+
+    public void setTotalComps(Integer totalComps) {
+        this.totalComps = totalComps;
+    }
 
     public void setOrganisation(Organisation organisation) {
         this.organisation = organisation;
@@ -110,12 +122,12 @@ public class Booking extends StandardEntity {
         return ticketStatus == null ? null : TicketStatus.fromId(ticketStatus);
     }
 
-    public void setTotalQuantity(Integer totalQuantity) {
-        this.totalQuantity = totalQuantity;
+    public void setTotalPaidTickets(Integer totalPaidTickets) {
+        this.totalPaidTickets = totalPaidTickets;
     }
 
-    public Integer getTotalQuantity() {
-        return totalQuantity;
+    public Integer getTotalPaidTickets() {
+        return totalPaidTickets;
     }
 
     public void setTotalPrice(Double totalPrice) {

@@ -1,15 +1,16 @@
 package com.srt.omega.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import com.haulmont.chile.core.annotations.NamePattern;
+import com.haulmont.cuba.core.entity.StandardEntity;
 import com.haulmont.cuba.core.entity.annotation.Lookup;
 import com.haulmont.cuba.core.entity.annotation.LookupType;
+
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import com.haulmont.cuba.core.entity.StandardEntity;
-import com.haulmont.chile.core.annotations.NamePattern;
+import javax.persistence.Table;
 
 @NamePattern("%s - %s|showTiming,ticketCategory")
 @Table(name = "OMEGA_BOOKING_ITEM")
@@ -27,8 +28,11 @@ public class BookingItem extends StandardEntity {
     @JoinColumn(name = "TICKET_CATEGORY_ID")
     protected TicketCategory ticketCategory;
 
-    @Column(name = "QUANTITY")
-    protected Integer quantity;
+    @Column(name = "PAID_TICKETS")
+    protected Integer paidTickets;
+
+    @Column(name = "COMPS")
+    protected Integer comps;
 
     @Lookup(type = LookupType.DROPDOWN)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -47,6 +51,22 @@ public class BookingItem extends StandardEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BOOKING_ID")
     protected Booking booking;
+
+    public Integer getPaidTickets() {
+        return paidTickets;
+    }
+
+    public void setPaidTickets(Integer paidTickets) {
+        this.paidTickets = paidTickets;
+    }
+
+    public Integer getComps() {
+        return comps;
+    }
+
+    public void setComps(Integer comps) {
+        this.comps = comps;
+    }
 
     public void setBooking(Booking booking) {
         this.booking = booking;
@@ -71,14 +91,6 @@ public class BookingItem extends StandardEntity {
 
     public TicketCategory getTicketCategory() {
         return ticketCategory;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
     }
 
     public void setPaymentCategory(PaymentCategory paymentCategory) {

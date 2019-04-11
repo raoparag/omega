@@ -141,15 +141,7 @@ public class SampleDataGenerator implements SampleDataGeneratorMBean {
             em.persist(paymentCategory);
             paymentCategoryList.add(paymentCategory);
             paymentCategory = metadata.create(PaymentCategory.class);
-            paymentCategory.setName("School Comps");
-            em.persist(paymentCategory);
-            paymentCategoryList.add(paymentCategory);
-            paymentCategory = metadata.create(PaymentCategory.class);
-            paymentCategory.setName("Corporate Comps");
-            em.persist(paymentCategory);
-            paymentCategoryList.add(paymentCategory);
-            paymentCategory = metadata.create(PaymentCategory.class);
-            paymentCategory.setName("Other Comps");
+            paymentCategory.setName("Other");
             em.persist(paymentCategory);
             paymentCategoryList.add(paymentCategory);
         });
@@ -591,12 +583,16 @@ public class SampleDataGenerator implements SampleDataGeneratorMBean {
     }
 
     private void calculateTotals(Booking booking) {
-        int totalQuantity = booking.getBookingItems().parallelStream().mapToInt(BookingItem::getQuantity).sum();
-        booking.setTotalQuantity(totalQuantity);
+        int totalPaidTickets = booking.getBookingItems().parallelStream().mapToInt(BookingItem::getPaidTickets).sum();
+        booking.setTotalPaidTickets(totalPaidTickets);
+        int totalComps = booking.getBookingItems().parallelStream().mapToInt(BookingItem::getComps).sum();
+        booking.setTotalComps(totalComps);
         double totalAmount = 0;
         for (BookingItem item : booking.getBookingItems()) {
-            totalAmount = totalAmount + (item.getQuantity() * (item.getTicketCategory().getPrice() + item.getSisticFee()));
-            totalAmount = totalAmount - (item.getDiscount() / 100 * item.getQuantity() * item.getTicketCategory().getPrice());
+            if (!item.getPaymentCategory().getName().matches(".*[Cc]omps.*")) {
+                totalAmount = totalAmount + (item.getPaidTickets() * (item.getTicketCategory().getPrice() + item.getSisticFee()));
+                totalAmount = totalAmount - (item.getDiscount() / 100 * item.getPaidTickets() * item.getTicketCategory().getPrice());
+            }
         }
         booking.setTotalPrice(totalAmount);
     }
@@ -606,7 +602,8 @@ public class SampleDataGenerator implements SampleDataGeneratorMBean {
         bookingItem.setBooking(booking);
         bookingItem.setPaymentCategory(paymentCategoryList.get(ThreadLocalRandom.current().nextInt(0, paymentCategoryList.size() - 1)));
         bookingItem.setDiscount((double) ThreadLocalRandom.current().nextInt(10));
-        bookingItem.setQuantity(ThreadLocalRandom.current().nextInt(10));
+        bookingItem.setPaidTickets(ThreadLocalRandom.current().nextInt(10));
+        bookingItem.setComps(ThreadLocalRandom.current().nextInt(10));
         bookingItem.setSisticFee((double) ThreadLocalRandom.current().nextInt(5));
         List<TicketCategory> ticketCats = new ArrayList<>(booking.getShow().getTicketCategories());
         bookingItem.setTicketCategory(ticketCats.get(ThreadLocalRandom.current().nextInt(ticketCats.size())));

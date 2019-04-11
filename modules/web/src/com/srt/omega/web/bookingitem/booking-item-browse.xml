@@ -33,7 +33,7 @@
             <columns>
                 <column id="showTiming"/>
                 <column id="ticketCategory"/>
-                <column id="quantity"/>
+                <column id="paidTickets"/>
                 <column id="paymentCategory"/>
                 <column id="discount"/>
                 <column id="sisticFee"/>
