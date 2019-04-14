@@ -1,23 +1,24 @@
 package com.srt.omega.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import com.haulmont.chile.core.annotations.Composition;
+import com.haulmont.chile.core.annotations.NamePattern;
+import com.haulmont.cuba.core.entity.StandardEntity;
 import com.haulmont.cuba.core.entity.annotation.Lookup;
 import com.haulmont.cuba.core.entity.annotation.LookupType;
 import com.haulmont.cuba.core.entity.annotation.OnDelete;
 import com.haulmont.cuba.core.global.DeletePolicy;
-import java.util.Date;
-import java.util.Set;
+
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import com.haulmont.cuba.core.entity.StandardEntity;
-import com.haulmont.chile.core.annotations.NamePattern;
+import java.util.Date;
+import java.util.Set;
 
 @NamePattern("%s @ %s|name,showVenue")
 @Table(name = "OMEGA_SHOW")
@@ -47,6 +48,9 @@ public class Show extends StandardEntity {
     @JoinColumn(name = "SHOW_VENUE_ID")
     protected ShowVenue showVenue;
 
+    @Column(name = "VENUE_CAPACITY")
+    protected Integer venueCapacity;
+
     @Column(name = "STATUS")
     protected Integer status;
 
@@ -62,6 +66,14 @@ public class Show extends StandardEntity {
     @OnDelete(DeletePolicy.CASCADE)
     @OneToMany(mappedBy = "show")
     protected Set<TicketCategory> ticketCategories;
+
+    public Integer getVenueCapacity() {
+        return venueCapacity;
+    }
+
+    public void setVenueCapacity(Integer venueCapacity) {
+        this.venueCapacity = venueCapacity;
+    }
 
     public void setTicketCategories(Set<TicketCategory> ticketCategories) {
         this.ticketCategories = ticketCategories;

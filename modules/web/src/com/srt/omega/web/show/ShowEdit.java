@@ -1,14 +1,17 @@
 package com.srt.omega.web.show;
 
+import com.haulmont.cuba.core.global.DataManager;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.Dialogs;
+import com.haulmont.cuba.gui.Notifications;
 import com.haulmont.cuba.gui.Screens;
 import com.haulmont.cuba.gui.components.AbstractEditor;
-import com.haulmont.cuba.gui.components.Action;
-import com.haulmont.cuba.gui.components.DialogAction;
+import com.haulmont.cuba.gui.components.Field;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
+import com.haulmont.cuba.gui.screen.Subscribe;
 import com.srt.omega.entity.Show;
 import com.srt.omega.entity.ShowTiming;
+import com.srt.omega.entity.ShowVenue;
 import com.srt.omega.entity.TicketCategory;
 import com.srt.omega.web.bulkadd.BulkAddScreen;
 import com.srt.omega.web.events.BulkAddEvent;
@@ -17,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
 
@@ -26,6 +30,17 @@ public class ShowEdit extends AbstractEditor<Show> {
 
     @Inject
     private Metadata metadata;
+
+    @Named("fieldGroup.showVenue")
+    private Field<ShowVenue> showVenue;
+
+    private String previousVenueName;
+
+    @Inject
+    private DataManager dataManager;
+
+    @Inject
+    private Notifications notifications;
 
     @Inject
     private CollectionDatasource<TicketCategory, UUID> ticketCategoriesDs;
@@ -40,6 +55,27 @@ public class ShowEdit extends AbstractEditor<Show> {
     private final String showTimingsBulkAddType = "ShowTimings";
 
     private Logger logger = LoggerFactory.getLogger(ShowEdit.class);
+
+    @Subscribe
+    protected void onInit(InitEvent event) {
+        showVenue.addValueChangeListener(stringValueChangeEvent -> {
+
+            int capacity = (int) dataManager.loadValue(
+                    "select e.capacity from omega$ShowVenue e " +
+                            "where e.name = :name", Integer.class)
+                    .parameter("name", showVenue.getValue().getName())
+                    .one();
+
+            if(previousVenueName == null && getItem().getVenueCapacity() != null)
+                return;
+            if((previousVenueName != null && !previousVenueName.equals(showVenue.getValue().getName()))
+                    || getItem().getVenueCapacity() == null) {
+                getItem().setVenueCapacity(capacity);
+                previousVenueName = showVenue.getValue().getName();
+            }
+
+        });
+    }
 
     public void onBulkAddTicketCategory() {
         BulkAddScreen bulkAddScreen = screens.create(BulkAddScreen.class);

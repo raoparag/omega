@@ -37,6 +37,7 @@
                 <column id="startDate"/>
                 <column id="endDate"/>
                 <column id="showVenue"/>
+                <column id="venueCapacity"/>
                 <column id="status"/>
                 <column id="notes"/>
             </columns>

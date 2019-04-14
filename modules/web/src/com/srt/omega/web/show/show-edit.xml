@@ -20,7 +20,8 @@
                 <field property="type"/>
                 <field property="startDate"/>
                 <field property="endDate"/>
-                <field optionsDatasource="showVenuesDs" property="showVenue"/>
+                <field property="showVenue" optionsDatasource="showVenuesDs"/>
+                <field property="venueCapacity"/>
                 <field property="status"/>
                 <field property="notes"/>
             </column>
