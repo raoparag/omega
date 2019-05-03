@@ -12,6 +12,44 @@
                 <![CDATA[select e from omega$Show e]]>
             </query>
         </collectionDatasource>
+        <valueCollectionDatasource id="salesByBookingStatusDs">
+            <query><![CDATA[select CASE
+                        WHEN (b.bookingStatus = 10) THEN 'On_Hold'
+                        WHEN (b.bookingStatus = 20) THEN 'Invoiced'
+                        WHEN (b.bookingStatus = 30) THEN 'Confirmed'
+                        ELSE 'Disbursement_Form_received' END, sum(b.totalPaidTickets)
+                            from omega$Booking b
+                            where b.show = :ds$showsDs
+                            group by b.bookingStatus]]>
+            </query>
+            <properties>
+                <property class="com.srt.omega.entity.Booking" name="bookingStatus"/>
+                <property datatype="decimal" name="sum"/>
+            </properties>
+        </valueCollectionDatasource>
+        <valueCollectionDatasource id="paymentCategoryDs">
+            <query></query>
+            <properties>
+                <property datatype="string" name="category"/>
+                <property datatype="string" name="totalCapacity"/>
+                <property datatype="string" name="paidTickets"/>
+                <property datatype="string" name="percentPaidTickets"/>
+                <property datatype="string" name="compTickets"/>
+                <property datatype="string" name="percentCompTickets"/>
+            </properties>
+        </valueCollectionDatasource>
+        <valueCollectionDatasource id="ticketCategoryDs">
+            <query></query>
+            <properties>
+                <property datatype="string" name="category"/>
+                <property datatype="string" name="totalCapacity"/>
+                <property datatype="string" name="paidTickets"/>
+                <property datatype="string" name="percentPaidTickets"/>
+                <property datatype="string" name="compTickets"/>
+                <property datatype="string" name="percentCompTickets"/>
+            </properties>
+        </valueCollectionDatasource>
+
         <valueCollectionDatasource id="salesByIndustryDs">
             <query>
                 <![CDATA[select b.organisation.industry, sum(b.totalPaidTickets)
@@ -45,26 +83,96 @@ group by b.organisation.name]]>
                 width="800"/>
     <layout expand="chartGrid"
             spacing="true">
-        <lookupField id="showLookup"
-                     caption="Select Show"
-                     optionsDatasource="showsDs"
-                     width="400px"/>
+        <grid id="showSelectionGrid" spacing="true">
+            <columns count="2"/>
+            <rows>
+                <row>
+                    <lookupField id="showLookup"
+                                 caption="Select Show"
+                                 optionsDatasource="showsDs"
+                                 width="400px"/>
+
+                    <lookupField id="showTimingLookup"
+                                 caption="Select Timing"
+                                 optionsDatasource="showTimeDs"
+                                 width="400px"/>
+
+                </row>
+            </rows>
+        </grid>
+        <grid id="summaryInfoChart" spacing="true">
+            <columns count="6"/>
+            <rows>
+                <row>
+                    <label id="totalShowLabel" stylename="success" value="Total Shows"/>
+                    <label id="ticketsAvailableLabel" stylename="success" value="No of Available Tickets"/>
+                    <label id="ticketsBookedLabel" stylename="success" value="No of Tickets Booked"/>
+                    <label id="totalSalesLabel" stylename="success" value="Total Sales"/>
+                    <label id="WeekendSalesLabel" stylename="success" value="Weekend Sales"/>
+                    <label id="WeekdaySalesLabel" stylename="success" value="Weekday Sales"/>
+                </row>
+            </rows>
+        </grid>
+
         <grid id="chartGrid"
               align="MIDDLE_CENTER"
               spacing="true">
             <columns count="2"/>
             <rows>
                 <row>
+                    <table id="tablePaymentsCategory" caption="Payment Category Summary"
+                           settingsEnabled="false">
+                        <columns>
+                            <column id="category"/>
+                            <column id="totalCapacity"/>
+                            <column id="paidTickets"/>
+                            <column id="percentPaidTickets"/>
+                            <column id="compTickets"/>
+                            <column id="percentCompTickets"/>
+                        </columns>
+                        <rows datasource="paymentCategoryDs"/>
+                        <rowsCount/>
+                    </table>
+                    <table id="tableTicketCategory" caption="Ticket Category Summary"
+                           settingsEnabled="false">
+                        <columns>
+                            <column id="category"/>
+                            <column id="totalCapacity"/>
+                            <column id="paidTickets"/>
+                            <column id="percentPaidTickets"/>
+                            <column id="compTickets"/>
+                            <column id="percentCompTickets"/>
+                        </columns>
+                        <rows datasource="ticketCategoryDs"/>
+                        <rowsCount/>
+
+                    </table>
+                </row>
+                <row>
                     <chart:pieChart id="salesByIndustry"
                                     caption="Sales By Industry"
                                     datasource="salesByIndustryDs"
                                     titleField="show"
-                                    valueField="sum"/>
+                                    valueField="sum"
+                                    balloonText="[[title]]&lt;br&gt;&lt;span style='font-size:14px'&gt;
+                        &lt;strong&gt;[[value]]&lt;/strong&gt; ([[percents]]%)&lt;/span&gt;"/>
+
                     <chart:pieChart id="individualSales"
                                     caption="Sales By Organisation"
                                     datasource="individualSalesDs"
                                     titleField="show"
-                                    valueField="sum"/>
+                                    valueField="sum"
+                                    balloonText="[[title]]&lt;br&gt;&lt;span style='font-size:14px'&gt;
+                        &lt;strong&gt;[[value]]&lt;/strong&gt; ([[percents]]%)&lt;/span&gt;"/>
+                </row>
+                <row>
+                    <chart:pieChart id="salesByBookingStatus"
+                                    caption="Sales By Booking Status"
+                                    datasource="salesByBookingStatusDs"
+                                    titleField="bookingStatus"
+                                    valueField="sum"
+                                    balloonText="[[title]]&lt;br&gt;&lt;span style='font-size:14px'&gt;
+                        &lt;strong&gt;[[value]]&lt;/strong&gt; ([[percents]]%)&lt;/span&gt;" />
                 </row>
             </rows>
         </grid>
