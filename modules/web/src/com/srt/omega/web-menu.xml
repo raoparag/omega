@@ -3,6 +3,7 @@
     <menu id="Dashboards" insertAfter="reports">
         <item screen="SalesDashboard"/>
         <item screen="omega$BookingItem.browse"/>
+        <item screen="omega_BookingMaster"/>
     </menu>
     <menu id="application-omega" insertBefore="administration">
         <item screen="omega$ShowVenue.browse"/>

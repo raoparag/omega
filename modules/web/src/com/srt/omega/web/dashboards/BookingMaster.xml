@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+<window xmlns="http://schemas.haulmont.com/cuba/screen/window.xsd"
         caption="msg://caption"
-        class="com.srt.omega.web.dashboards.Salesdashboard"
-        messagesPack="com.srt.omega.web.dashboards"
-        xmlns:chart="http://schemas.haulmont.com/charts/charts.xsd">
+        messagesPack="com.srt.omega.web.dashboards">
     <dsContext>
         <collectionDatasource id="showsDs"
                               class="com.srt.omega.entity.Show"
@@ -50,36 +48,16 @@
     </dsContext>
     <dialogMode height="600"
                 width="800"/>
-    <layout expand="chartGrid"
-            spacing="true">
+    <layout spacing="true">
         <hbox spacing="true">
             <lookupField id="showLookup"
-                             caption="Select Show"
-                             optionsDatasource="showsDs"
-                             width="400px"/>
+                         caption="Select Show"
+                         optionsDatasource="showsDs"
+                         width="400px"/>
             <lookupField id="showTimeLookup"
-                             caption="Select ShowTime"
-                             optionsDatasource="showTimingsDs"
-                             width="400px"/>
+                         caption="Select ShowTime"
+                         optionsDatasource="showTimingsDs"
+                         width="400px"/>
         </hbox>
-        <grid id="chartGrid"
-              align="MIDDLE_CENTER"
-              spacing="true">
-            <columns count="2"/>
-            <rows>
-                <row>
-                    <chart:pieChart id="salesByIndustry"
-                                    caption="Sales By Industry"
-                                    datasource="salesByIndustryDs"
-                                    titleField="show"
-                                    valueField="sum"/>
-                    <chart:pieChart id="individualSales"
-                                    caption="Sales By Organisation"
-                                    datasource="individualSalesDs"
-                                    titleField="show"
-                                    valueField="sum"/>
-                </row>
-            </rows>
-        </grid>
     </layout>
 </window>

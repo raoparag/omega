@@ -24,7 +24,7 @@
             <properties include=".*"/>
         </filter>
         <groupTable id="bookingItemsTable"
-                    width="100%">
+                    width="100%" aggregatable="true">
             <actions>
                 <action id="refresh"/>
                 <action id="excel"
@@ -33,7 +33,9 @@
             <columns>
                 <column id="showTiming"/>
                 <column id="ticketCategory"/>
-                <column id="paidTickets"/>
+                <column id="paidTickets">
+                    <aggregation type="SUM"/>
+                </column>
                 <column id="paymentCategory"/>
                 <column id="discount"/>
                 <column id="sisticFee"/>
