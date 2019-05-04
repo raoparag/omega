@@ -69,7 +69,7 @@ public class ShowEdit extends AbstractEditor<Show> {
 
     private void bulkAddShowTimings(String bulkData) {
         String[] lines = bulkData.split("\\n");
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         int counter = 0;
         for (String line : lines) {
             try {
