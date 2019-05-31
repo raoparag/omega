@@ -9,7 +9,7 @@
                               class="com.srt.omega.entity.Show"
                               view="show-view">
             <query>
-                <![CDATA[select e from omega$Show e]]>
+                <![CDATA[select e from omega$Show e order by e.name]]>
             </query>
         </collectionDatasource>
         <valueCollectionDatasource id="salesByBookingStatusDs">
@@ -36,6 +36,17 @@
                 <property datatype="string" name="percentPaidTickets"/>
                 <property datatype="string" name="compTickets"/>
                 <property datatype="string" name="percentCompTickets"/>
+            </properties>
+        </valueCollectionDatasource>
+        <valueCollectionDatasource id="showSummarySalesDs">
+            <query></query>
+            <properties>
+                <property datatype="string" name="totalShowColumn"/>
+                <property datatype="string" name="totalSalesColumn"/>
+                <property datatype="string" name="weekendSalesColumn"/>
+                <property datatype="string" name="weekdaySalesColumn"/>
+                <property datatype="string" name="ticketsAvailableColumn"/>
+                <property datatype="string" name="ticketsBookedColumn"/>
             </properties>
         </valueCollectionDatasource>
         <valueCollectionDatasource id="ticketCategoryDs">
@@ -100,25 +111,27 @@ group by b.organisation.name]]>
                 </row>
             </rows>
         </grid>
-        <grid id="summaryInfoChart" spacing="true">
-            <columns count="6"/>
-            <rows>
-                <row>
-                    <label id="totalShowLabel" stylename="success" value="Total Shows"/>
-                    <label id="ticketsAvailableLabel" stylename="success" value="No of Available Tickets"/>
-                    <label id="ticketsBookedLabel" stylename="success" value="No of Tickets Booked"/>
-                    <label id="totalSalesLabel" stylename="success" value="Total Sales"/>
-                    <label id="WeekendSalesLabel" stylename="success" value="Weekend Sales"/>
-                    <label id="WeekdaySalesLabel" stylename="success" value="Weekday Sales"/>
-                </row>
-            </rows>
-        </grid>
+
 
         <grid id="chartGrid"
               align="MIDDLE_CENTER"
               spacing="true">
             <columns count="2"/>
             <rows>
+                <row>
+                    <table id="tableShowSummaryInfo" settingsEnabled="false" colspan="2" align="MIDDLE_CENTER">
+                        <columns>
+                            <column id="totalShowColumn" caption="Total Shows"/>
+                            <column id="totalSalesColumn" caption="Total Sales"/>
+                            <column id="weekendSalesColumn" caption="Weekend Sales"/>
+                            <column id="weekdaySalesColumn" caption="Weekday Sales"/>
+                            <column id="ticketsAvailableColumn" caption="No of Available Tickets"/>
+                            <column id="ticketsBookedColumn" caption="No of Tickets Booked"/>
+                        </columns>
+                        <rows datasource="showSummarySalesDs"/>
+                        <rowsCount/>
+                    </table>
+                </row>
                 <row>
                     <table id="tablePaymentsCategory" caption="Payment Category Summary"
                            settingsEnabled="false">
@@ -142,6 +155,7 @@ group by b.organisation.name]]>
                             <column id="percentPaidTickets"/>
                             <column id="compTickets"/>
                             <column id="percentCompTickets"/>
+
                         </columns>
                         <rows datasource="ticketCategoryDs"/>
                         <rowsCount/>
