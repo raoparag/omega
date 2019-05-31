@@ -15,6 +15,7 @@ import com.srt.omega.entity.PaymentCategory;
 import com.srt.omega.entity.Show;
 import com.srt.omega.entity.ShowTiming;
 import com.srt.omega.entity.TicketCategory;
+import org.springframework.util.CollectionUtils;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,23 +33,8 @@ public class Salesdashboard extends AbstractWindow {
     @Named("showLookup")
     private Field<Show> show;
 
-    @Named("totalShowLabel")
-    private Label totalShowLabel;
-
-    @Named("totalSalesLabel")
-    private Label totalSalesLabel;
-
-    @Named("ticketsBookedLabel")
-    private Label ticketsBookedLabel;
-
-    @Named("ticketsAvailableLabel")
-    private Label ticketsAvailableLabel;
-
-    @Named("WeekendSalesLabel")
-    private Label weekendSalesLabel;
-
-    @Named("WeekdaySalesLabel")
-    private Label weekdaySalesLabel;
+    @Named("showSummarySalesDs")
+    private ValueCollectionDatasourceImpl collectionDatasourceShowSummary;
 
     @Named("showTimingLookup")
     private LookupField<ShowTiming> showTimingField;
@@ -89,9 +75,11 @@ public class Salesdashboard extends AbstractWindow {
     }
 
     private void cleanShowTiming() {
-        totalShowLabel.setValue(null);
         showTimingField.setValue(null);
         showTimingField.setOptionsList(new ArrayList<>());
+        collectionDatasourceShowSummary.clear();
+        collectionDatasourceShowSummary.commit();
+        collectionDatasourceShowSummary.setRefreshMode(CollectionDatasource.RefreshMode.NEVER);
     }
 
 
@@ -121,46 +109,55 @@ public class Salesdashboard extends AbstractWindow {
                 " where b.show = :show and b1.showTiming = :showTiming";
 
         for(int i = 0 ; i < showTimings.size() ; i++){
+
             Calendar c = Calendar.getInstance();
             c.setTime(showTimings.get(i).getShowTime());
             int dayofWeek = c.get(Calendar.DAY_OF_WEEK); // 1 Sun and 7 Sat
-            if(dayofWeek == 1 || dayofWeek == 7){
-                Optional<Integer> total = dataManager.loadValue(queryString, Integer.class)
-                        .parameter("show", show.getValue())
-                        .parameter("showTiming", showTimings.get(i))
-                        .optional();
-                if(total.isPresent()){
-                    addtotalWeekend += total.get();
-                }
 
-            }else{
-                Optional<Integer> total = dataManager.loadValue(queryString, Integer.class)
-                        .parameter("show", show.getValue())
-                        .parameter("showTiming", showTimings.get(i))
-                        .optional();
-                if(total.isPresent()){
+            Optional<Integer> total = dataManager.loadValue(queryString, Integer.class)
+                    .parameter("show", show.getValue())
+                    .parameter("showTiming", showTimings.get(i))
+                    .optional();
+
+            if(total.isPresent()) {
+                if (dayofWeek == 1 || dayofWeek == 7) {
+                    addtotalWeekend += total.get();
+                } else {
                     addtotalWeekday += total.get();
                 }
             }
         }
-        weekendSalesLabel.setValue("Weekend Sales \n" + addtotalWeekend);
-        weekdaySalesLabel.setValue("Weekday Sales \n" + addtotalWeekday);
 
+        KeyValueEntity keyValueEntity;
+        List<Object> listItems = collectionDatasourceShowSummary.getItemIds(0,1);
+        if(CollectionUtils.isEmpty(listItems)){
+            keyValueEntity = new KeyValueEntity();
+            collectionDatasourceShowSummary.addItem(keyValueEntity);
+        }else{
+            keyValueEntity = (KeyValueEntity) collectionDatasourceShowSummary.getItem(listItems.get(0));
+        }
+
+        keyValueEntity.setValue("weekdaySalesColumn", String.valueOf(addtotalWeekday));
+        keyValueEntity.setValue("weekendSalesColumn", String.valueOf(addtotalWeekend));
 
         /* total sales of all the showtiming */
-        int totalSalesOfAllTiming = (int) dataManager.loadValue(
+        Optional<Integer> totalSalesOfAllTiming = dataManager.loadValue(
                 "select sum(b.totalPrice) from omega$Booking b " +
                         "where b.show.name = :showName", Integer.class)
                 .parameter("showName", show.getValue().getName())
-                .one();
+                .optional();
 
-
-
-        totalSalesLabel.setValue("Total Sales \n $ " + totalSalesOfAllTiming);
 
         showTimingField.setOptionsList(showTimings);
+        if(totalSalesOfAllTiming.isPresent()){
+            keyValueEntity.setValue("totalSalesColumn", String.valueOf(totalSalesOfAllTiming.get()));
+        }else{
+            keyValueEntity.setValue("totalSalesColumn", String.valueOf(0));
+        }
 
-        totalShowLabel.setValue("Total Shows \n" + show.getValue().getShowTimings().size());
+
+        keyValueEntity.setValue("totalShowColumn", String.valueOf(show.getValue().getShowTimings().size()));
+
     }
 
     private void updateTicketCountStatus(){
@@ -194,13 +191,15 @@ public class Salesdashboard extends AbstractWindow {
 
         }
 
-        ticketsBookedLabel.setValue("No of Tickets Booked \n " + totalSalesValue);
+        KeyValueEntity keyValueEntity = (KeyValueEntity)collectionDatasourceShowSummary.getItem
+                (collectionDatasourceShowSummary.getItemIds(0,1).get(0));
+        keyValueEntity.setValue("ticketsBookedColumn", String.valueOf(totalSalesValue));
 
         /* Available tickets*/
         if(capacity == 0){
-            ticketsAvailableLabel.setValue("No of Available Tickets \n 0/0" );
+            keyValueEntity.setValue("ticketsAvailableColumn", "0/0");
         }else {
-            ticketsAvailableLabel.setValue("No of Available Tickets \n " + (capacity - totalSalesValue) + " / " + capacity);
+            keyValueEntity.setValue("ticketsAvailableColumn", (capacity - totalSalesValue) + " / " + capacity);
         }
 
     }
@@ -236,7 +235,7 @@ public class Salesdashboard extends AbstractWindow {
                 .parameter("showTiming", showTimingField.getValue())
                 .optional();
         if (!totalSalesOptional.isPresent()) {
-            loadEmptyData(totalCapacity);
+            loadEmptyData(totalCapacity, isShowTimingSelected);
             return;
         }
 //        int totalSales = totalSalesOptional.get();
@@ -244,11 +243,13 @@ public class Salesdashboard extends AbstractWindow {
         /* Populate Payment Category table */
         queryString = "select b.paymentCategory, sum(b.paidTickets), sum(b.comps) from omega$BookingItem b" +
                 " inner join omega$Booking b1 on b.booking = b1" +
-                ((!isShowTimingSelected ? "" : " where b.showTiming = :showTiming")) +
+                " where b1.show = :show" +
+                ((!isShowTimingSelected ? "" : " and b.showTiming = :showTiming")) +
                 " group by b.paymentCategory order by b.paymentCategory.name";
 
 
         List<KeyValueEntity> paymentCategoryList = dataManager.loadValues(queryString)
+                .parameter("show", show.getValue())
                 .parameter("showTiming", showTimingField.getValue())
                 .properties("paymentCategory", "paidTickets", "compTickets")
                 .list();
@@ -258,10 +259,12 @@ public class Salesdashboard extends AbstractWindow {
         /* Populate Ticket Category table */
         queryString = "select b.ticketCategory, sum(b.paidTickets), sum(b.comps) from omega$BookingItem b" +
                 " inner join omega$Booking b1 on b.booking = b1" +
-                ((!isShowTimingSelected ? "" : " where b.showTiming = :showTiming")) +
+                " where b1.show = :show" +
+                ((!isShowTimingSelected ? "" : " and b.showTiming = :showTiming")) +
                 " group by b.ticketCategory order by b.ticketCategory.categoryName";
 
         List<KeyValueEntity> ticketCategoryList = dataManager.loadValues(queryString)
+                .parameter("show", show.getValue())
                 .parameter("showTiming", showTimingField.getValue())
                 .properties("ticketCategory", "paidTickets", "compTickets")
                 .list();
@@ -270,10 +273,9 @@ public class Salesdashboard extends AbstractWindow {
     }
 
     private void populatePaymentsTable(List<KeyValueEntity> paymentCategoryList, final int totalCapacity) {
-        List<KeyValueEntity> keyValueEntities;
 
         DecimalFormat df = new DecimalFormat("#.##");
-        keyValueEntities = paymentCategoryList.stream().map(keyValueEntity -> {
+        paymentCategoryList.forEach(keyValueEntity -> {
             KeyValueEntity newKeyValueEntity = new KeyValueEntity();
             PaymentCategory category = (PaymentCategory) keyValueEntity.getValue("paymentCategory");
 
@@ -299,17 +301,13 @@ public class Salesdashboard extends AbstractWindow {
             newKeyValueEntity.setValue("compTickets", compTicketsLbl);
             newKeyValueEntity.setValue("percentCompTickets", df.format(compTicketsValue) + "%");
 
-            newKeyValueEntity.setMetaClass(collectionDatasourcePayment.getMetaClass());
-            return newKeyValueEntity;
-        }).collect(Collectors.toList());
+            collectionDatasourcePayment.addItem(newKeyValueEntity);
+        });
 
-        keyValueEntities.stream().forEach(keyValueEntity -> collectionDatasourcePayment.addItem(keyValueEntity));
-        collectionDatasourcePayment.commit();
 
     }
 
     private void populateTicketTable(List<KeyValueEntity> ticketCategoryList) {
-        List<KeyValueEntity> keyValueEntities;
 
         Map<String, Integer> ticketCategoryCapacityMap = new HashMap<>();
         for (TicketCategory ticketCategory : show.getValue().getTicketCategories()){
@@ -317,7 +315,7 @@ public class Salesdashboard extends AbstractWindow {
         }
 
         DecimalFormat df = new DecimalFormat("#.##");
-        keyValueEntities = ticketCategoryList.stream().map(keyValueEntity -> {
+        ticketCategoryList.forEach(keyValueEntity -> {
             KeyValueEntity newKeyValueEntity = new KeyValueEntity();
             TicketCategory category = (TicketCategory) keyValueEntity.getValue("ticketCategory");
 
@@ -345,12 +343,8 @@ public class Salesdashboard extends AbstractWindow {
             newKeyValueEntity.setValue("compTickets", compTicketsLbl);
             newKeyValueEntity.setValue("percentCompTickets", df.format(compTicketsValue) + "%");
 
-            newKeyValueEntity.setMetaClass(collectionDatasourceTicket.getMetaClass());
-            return newKeyValueEntity;
-        }).collect(Collectors.toList());
-
-        keyValueEntities.stream().forEach(keyValueEntity -> collectionDatasourceTicket.addItem(keyValueEntity));
-        collectionDatasourceTicket.commit();
+            collectionDatasourceTicket.addItem(newKeyValueEntity);
+        });
 
     }
 
@@ -366,7 +360,7 @@ public class Salesdashboard extends AbstractWindow {
         collectionDatasourceTicket.setRefreshMode(CollectionDatasource.RefreshMode.NEVER);
     }
 
-    private void loadEmptyData(int totalCapacity) {
+    private void loadEmptyData(int totalCapacity, boolean isShowTimingSelected) {
         String queryString = "select p, 0 from omega$PaymentCategory p";
 
         List<KeyValueEntity> paymentCategoryList = dataManager.loadValues(queryString)
@@ -374,9 +368,17 @@ public class Salesdashboard extends AbstractWindow {
                 .list();
         populatePaymentsTable(paymentCategoryList, totalCapacity);
 
-        queryString = "select p, 0 from omega$TicketCategory p";
+        queryString = "select t, 0 from omega$TicketCategory t" +
+                " left join omega$Show s on t.show = s" +
+
+//        queryString = "select s.ticketCategories, 0 from omega$Show s" +
+                    " where s.id = :show" +
+                    ((!isShowTimingSelected ? "" : " and s.showTimings = :showTiming"));
 
         List<KeyValueEntity> ticketCategoryList = dataManager.loadValues(queryString)
+                .parameter("show", show.getValue().getUuid())
+                .parameter("showTiming", showTimingField.getValue())
+
                 .properties("ticketCategory", "paidTickets")
                 .list();
         populateTicketTable(ticketCategoryList);
