@@ -50,11 +50,16 @@ public class Salesdashboard extends AbstractWindow {
     @Named("ticketCategoryDs")
     private ValueCollectionDatasourceImpl collectionDatasourceTicket;
 
+    @Named("ticketOrganisationBookingDs")
+    private ValueCollectionDatasourceImpl collectionOrganisationBooking;
+
     @Inject
     private DataManager dataManager;
 
     @Inject
     private Notifications notifications;
+
+    DecimalFormat df = new DecimalFormat("#.##");
 
     private CountDownLatch resetFilters = new CountDownLatch(0);
 
@@ -194,9 +199,11 @@ public class Salesdashboard extends AbstractWindow {
 
         boolean isOrganisationSelected = organisationLookupField.getValue() != null;
 
-        String queryString = "select sum(b.totalPrice), sum(b.totalPaidTickets + b.totalComps) from omega$Booking b" +
-                " inner join omega$BookingItem b1 on b.bookingItems = b1" +
-                " where b.show = :show and b1.showTiming = :showTiming" +
+        String queryString = "select sum(b1.paidTickets * (b1.ticketCategory.price * (1 - b1.discount/100) + b1.sisticFee)), " +
+                " sum(b1.paidTickets + b1.comps) from omega$BookingItem b1" +
+                " inner join omega$Booking b on b1.booking = b" +
+                " where b.show = :show " +
+                " and b1.showTiming = :showTiming " +
                 (!isOrganisationSelected ? "": " and b.organisation = :organisation");
 
         for(int i = 0 ; i < showTimings.size() ; i++){
@@ -212,7 +219,6 @@ public class Salesdashboard extends AbstractWindow {
                     .properties("totalTicketValue", "totalTicketCount")
                     .one();
 
-
             long tempData;
             if(totalData.getValue("totalTicketCount") != null) {
                 tempData = totalData.getValue("totalTicketCount");
@@ -222,20 +228,19 @@ public class Salesdashboard extends AbstractWindow {
                 } else {
                     addtotalWeekday += tempData;
                 }
-            }
 
-            double tempDataDouble;
-            if(totalData.getValue("totalTicketValue") != null) {
-                tempDataDouble = totalData.getValue("totalTicketValue");
-                totalTicketValue += tempDataDouble;
+                double tempDataDouble;
+                if(totalData.getValue("totalTicketValue") != null) {
+                    tempDataDouble = totalData.getValue("totalTicketValue");
+                    totalTicketValue += tempDataDouble;
+                }
             }
-
 
         }
 
         totalTicketsSold = addtotalWeekend + addtotalWeekday;
 
-        int capacity;
+        long capacity;
 
         /* total capacity */
         queryString = "select e.capacity from omega$ShowVenue e " +
@@ -243,6 +248,8 @@ public class Salesdashboard extends AbstractWindow {
         capacity = dataManager.loadValue(queryString, Integer.class)
                 .parameter("venueName", show.getValue().getShowVenue().getName())
                 .one();
+
+        capacity *= showTimings.size();
 
         KeyValueEntity keyValueEntity;
         List<Object> listItems = collectionDatasourceShowSummary.getItemIds(0,1);
@@ -253,18 +260,19 @@ public class Salesdashboard extends AbstractWindow {
             keyValueEntity = collectionDatasourceShowSummary.getItem(listItems.get(0));
         }
 
-        keyValueEntity.setValue("weekdaySalesColumn", String.valueOf(addtotalWeekday));
-        keyValueEntity.setValue("weekendSalesColumn", String.valueOf(addtotalWeekend));
+        keyValueEntity.setValue("weekdaySalesColumn", df.format(calculatePercent(addtotalWeekday, capacity)) + "%");
+        keyValueEntity.setValue("weekendSalesColumn", df.format(calculatePercent(addtotalWeekend, capacity)) + "%");
         keyValueEntity.setValue("totalSalesColumn", "$"+ NumberFormat.getNumberInstance(Locale.US).format(totalTicketValue));
         keyValueEntity.setValue("totalShowColumn", String.valueOf(showTimings.size()));
-        keyValueEntity.setValue("ticketsBookedColumn", String.valueOf(totalTicketsSold));
+        keyValueEntity.setValue("ticketsBookedColumn", df.format(calculatePercent(totalTicketsSold, capacity)) + "%");
 
 
         /* Available tickets*/
         if(capacity == 0){
-            keyValueEntity.setValue("ticketsAvailableColumn", "0/0");
+            keyValueEntity.setValue("ticketsAvailableColumn", "0%");
         }else {
-            keyValueEntity.setValue("ticketsAvailableColumn", ((showTimings.size()*capacity - totalTicketsSold)) + " / " + (showTimings.size()*capacity));
+            double percentAvailable = calculatePercent(((capacity - totalTicketsSold)), capacity);
+            keyValueEntity.setValue("ticketsAvailableColumn",  df.format(percentAvailable)+"%");
         }
 
     }
@@ -280,16 +288,17 @@ public class Salesdashboard extends AbstractWindow {
 
         boolean isShowTimingSelected = showTimingField.getValue() != null;
         boolean isOrganisationSelected = organisationLookupField.getValue() != null;
+        int showTimeCount = (isShowTimingSelected ? 1 :show.getValue().getShowTimings().size());
 
         /* Total capacity */
         queryString = "select e.capacity from omega$ShowVenue e " +
                 "where e.name = :venueName";
 
-        int capacity = dataManager.loadValue(queryString, Integer.class)
+        long capacity = dataManager.loadValue(queryString, Integer.class)
                 .parameter("venueName", show.getValue().getShowVenue().getName())
                 .one();
 
-        final int totalCapacity = (isShowTimingSelected ? capacity : capacity * show.getValue().getShowTimings().size());
+        final long totalCapacity = showTimeCount * capacity;
 
         /* Total sales */
         queryString = "select sum(b.totalPaidTickets) from omega$Booking b " +
@@ -304,7 +313,7 @@ public class Salesdashboard extends AbstractWindow {
                 .parameter("organisation", organisationLookupField.getValue())
                 .optional();
         if (!totalSalesOptional.isPresent()) {
-            loadEmptyData(totalCapacity, isShowTimingSelected);
+            loadEmptyData(totalCapacity, isShowTimingSelected, showTimeCount);
             return;
         }
 //        int totalSales = totalSalesOptional.get();
@@ -341,13 +350,29 @@ public class Salesdashboard extends AbstractWindow {
                 .parameter("organisation", organisationLookupField.getValue())
                 .properties("ticketCategory", "paidTickets", "compTickets")
                 .list();
-        populateTicketTable(ticketCategoryList);
+        populateTicketTable(ticketCategoryList, showTimeCount);
+
+
+        /* Updating collectionOrganisationBooking */
+        queryString = "select b1.organisation, sum(b.paidTickets), sum(b.comps) from omega$BookingItem b" +
+                " inner join omega$Booking b1 on b.booking = b1" +
+                " where b1.show = :show" +
+                (!isShowTimingSelected ? "" : " and b.showTiming = :showTiming") +
+                (!isOrganisationSelected ? "" : " and b1.organisation = :organisation ") +
+                " group by b1.organisation order by b1.organisation.name";
+
+        List<KeyValueEntity> organisationBookingList = dataManager.loadValues(queryString)
+                .parameter("show", show.getValue())
+                .parameter("showTiming", showTimingField.getValue())
+                .parameter("organisation", organisationLookupField.getValue())
+                .properties("organisation", "paidTickets", "compTickets")
+                .list();
+        populateOrganisationBookingTable(organisationBookingList, totalCapacity);
 
     }
 
-    private void populatePaymentsTable(List<KeyValueEntity> paymentCategoryList, final int totalCapacity) {
+    private void populatePaymentsTable(List<KeyValueEntity> paymentCategoryList, final long totalCapacity) {
 
-        DecimalFormat df = new DecimalFormat("#.##");
         paymentCategoryList.forEach(keyValueEntity -> {
             KeyValueEntity newKeyValueEntity = new KeyValueEntity();
             PaymentCategory category = (PaymentCategory) keyValueEntity.getValue("paymentCategory");
@@ -357,15 +382,13 @@ public class Salesdashboard extends AbstractWindow {
             Object paidTickets = keyValueEntity.getValue("paidTickets");
             if(paidTickets != null) {
                 paidTicketsLbl = paidTickets.toString();
-                paidTicketsValue = 1.0 * Integer.parseInt(paidTicketsLbl) / totalCapacity;
-                paidTicketsValue = 1.0 * Math.round(paidTicketsValue * 100) / 100;
+                paidTicketsValue = calculatePercent(Long.parseLong(paidTicketsLbl),  totalCapacity);
             }
 
             Object compTickets = keyValueEntity.getValue("compTickets");
             if(compTickets != null) {
                 compTicketsLbl = compTickets.toString();
-                compTicketsValue = 1.0 * Integer.parseInt(compTicketsLbl) / totalCapacity;
-                compTicketsValue = 1.0 * Math.round(compTicketsValue * 100) / 100;
+                compTicketsValue = calculatePercent(Long.parseLong(compTicketsLbl),  totalCapacity);
             }
             newKeyValueEntity.setValue("category", category.getName());
             newKeyValueEntity.setValue("totalCapacity", String.valueOf(totalCapacity));
@@ -381,33 +404,30 @@ public class Salesdashboard extends AbstractWindow {
 
     }
 
-    private void populateTicketTable(List<KeyValueEntity> ticketCategoryList) {
+    private void populateTicketTable(List<KeyValueEntity> ticketCategoryList, final int showTimingCount) {
 
         Map<String, Integer> ticketCategoryCapacityMap = new HashMap<>();
         for (TicketCategory ticketCategory : show.getValue().getTicketCategories()){
             ticketCategoryCapacityMap.put(ticketCategory.getCategoryName(), ticketCategory.getCapacity());
         }
 
-        DecimalFormat df = new DecimalFormat("#.##");
         ticketCategoryList.forEach(keyValueEntity -> {
             KeyValueEntity newKeyValueEntity = new KeyValueEntity();
             TicketCategory category = (TicketCategory) keyValueEntity.getValue("ticketCategory");
 
-            int totalCapacity = ticketCategoryCapacityMap.get(category.getCategoryName());
+            long totalCapacity = ticketCategoryCapacityMap.get(category.getCategoryName()) * showTimingCount;
             Double paidTicketsValue = 0.0, compTicketsValue = 0.0;
             String paidTicketsLbl = "0", compTicketsLbl = "0";
             Object paidTickets = keyValueEntity.getValue("paidTickets");
             if(paidTickets != null) {
                 paidTicketsLbl = paidTickets.toString();
-                paidTicketsValue = 1.0 * Integer.parseInt(paidTicketsLbl) / totalCapacity;
-                paidTicketsValue = 1.0 * Math.round(paidTicketsValue * 100) / 100;
+                paidTicketsValue = calculatePercent(Long.parseLong(paidTicketsLbl),  totalCapacity);
             }
 
             Object compTickets = keyValueEntity.getValue("compTickets");
             if(compTickets != null) {
                 compTicketsLbl = compTickets.toString();
-                compTicketsValue = 1.0 * Integer.parseInt(compTicketsLbl) / totalCapacity;
-                compTicketsValue = 1.0 * Math.round(compTicketsValue * 100) / 100;
+                compTicketsValue = calculatePercent(Long.parseLong(compTicketsLbl), totalCapacity);
             }
 
             newKeyValueEntity.setValue("category", category.getCategoryName());
@@ -422,15 +442,53 @@ public class Salesdashboard extends AbstractWindow {
         collectionDatasourceTicket.refresh();
     }
 
+    /**
+     *
+     * @param organisationBookingList
+     * @param totalCapacity Total capacity of venue across all show timings or for a particular day
+     */
+    private void populateOrganisationBookingTable(List<KeyValueEntity> organisationBookingList, long totalCapacity) {
+
+        organisationBookingList.forEach(keyValueEntity -> {
+            KeyValueEntity newKeyValueEntity = new KeyValueEntity();
+            Organisation organisation = (Organisation) keyValueEntity.getValue("organisation");
+
+            Double paidTicketsValue = 0.0, compTicketsValue = 0.0;
+            String paidTicketsLbl = "0", compTicketsLbl = "0";
+            Object paidTickets = keyValueEntity.getValue("paidTickets");
+            if(paidTickets != null) {
+                paidTicketsLbl = paidTickets.toString();
+                paidTicketsValue = calculatePercent(Long.parseLong(paidTicketsLbl), totalCapacity);
+            }
+
+            Object compTickets = keyValueEntity.getValue("compTickets");
+            if(compTickets != null) {
+                compTicketsLbl = compTickets.toString();
+                compTicketsValue = calculatePercent(Long.parseLong(compTicketsLbl), totalCapacity);
+            }
+
+            newKeyValueEntity.setValue("organisation", organisation.getName());
+            newKeyValueEntity.setValue("totalCapacity", String.valueOf(totalCapacity));
+            newKeyValueEntity.setValue("paidTickets", paidTicketsLbl);
+            newKeyValueEntity.setValue("percentPaidTickets", df.format(paidTicketsValue) + "%");
+            newKeyValueEntity.setValue("compTickets", compTicketsLbl);
+            newKeyValueEntity.setValue("percentCompTickets", df.format(compTicketsValue) + "%");
+
+            collectionOrganisationBooking.addItem(newKeyValueEntity);
+        });
+        collectionOrganisationBooking.refresh();
+    }
 
     private void clearPreviousData() {
         collectionDatasourcePayment.revert();
         collectionDatasourceTicket.revert();
+        collectionOrganisationBooking.revert();
         collectionDatasourcePayment.setRefreshMode(CollectionDatasource.RefreshMode.NEVER);
         collectionDatasourceTicket.setRefreshMode(CollectionDatasource.RefreshMode.NEVER);
+        collectionOrganisationBooking.setRefreshMode(CollectionDatasource.RefreshMode.NEVER);
     }
 
-    private void loadEmptyData(int totalCapacity, boolean isShowTimingSelected) {
+    private void loadEmptyData(long totalCapacity, boolean isShowTimingSelected, int showTimeCount) {
         String queryString = "select p, 0 from omega$PaymentCategory p";
 
         List<KeyValueEntity> paymentCategoryList = dataManager.loadValues(queryString)
@@ -449,7 +507,8 @@ public class Salesdashboard extends AbstractWindow {
 
                 .properties("ticketCategory", "paidTickets")
                 .list();
-        populateTicketTable(ticketCategoryList);
+
+        populateTicketTable(ticketCategoryList, showTimeCount);
 
     }
 
@@ -497,5 +556,12 @@ public class Salesdashboard extends AbstractWindow {
         collectionDatasourceShowSummary.setRefreshMode(CollectionDatasource.RefreshMode.NEVER);
     }
 
+
+    private double calculatePercent(long a, long b){
+        double percent;
+        percent = 100.0 * a / b;
+        percent = (1.0 * Math.round(percent * 100)) / 100;
+        return percent;
+    }
 
 }
