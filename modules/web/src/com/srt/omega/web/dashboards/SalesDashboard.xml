@@ -12,21 +12,14 @@
                 <![CDATA[select e from omega$Show e order by e.name]]>
             </query>
         </collectionDatasource>
-        <valueCollectionDatasource id="salesByBookingStatusDs">
-            <query><![CDATA[select CASE
-                        WHEN (b.bookingStatus = 10) THEN 'On_Hold'
-                        WHEN (b.bookingStatus = 20) THEN 'Invoiced'
-                        WHEN (b.bookingStatus = 30) THEN 'Confirmed'
-                        ELSE 'Disbursement_Form_received' END, sum(b.totalPaidTickets)
-                            from omega$Booking b
-                            where b.show = :ds$showsDs
-                            group by b.bookingStatus]]>
+
+        <collectionDatasource id="organizationDs"
+                              class="com.srt.omega.entity.Organisation"
+                              view="organisation-view">
+            <query>
+                <![CDATA[select e from omega$Organisation e order by e.name]]>
             </query>
-            <properties>
-                <property class="com.srt.omega.entity.Booking" name="bookingStatus"/>
-                <property datatype="decimal" name="sum"/>
-            </properties>
-        </valueCollectionDatasource>
+        </collectionDatasource>
         <valueCollectionDatasource id="paymentCategoryDs">
             <query></query>
             <properties>
@@ -61,43 +54,33 @@
             </properties>
         </valueCollectionDatasource>
 
-        <valueCollectionDatasource id="salesByIndustryDs">
-            <query>
-                <![CDATA[select b.organisation.industry, sum(b.totalPaidTickets)
-from omega$Booking b
-where b.show = :ds$showsDs
-group by b.organisation.industry]]>
-            </query>
+        <valueCollectionDatasource id="ticketOrganisationBookingDs">
+            <query></query>
             <properties>
-                <property class="com.srt.omega.entity.Booking"
-                          name="show"/>
-                <property datatype="decimal"
-                          name="sum"/>
+                <property datatype="string" name="organisation"/>
+                <property datatype="string" name="totalCapacity"/>
+                <property datatype="string" name="paidTickets"/>
+                <property datatype="string" name="percentPaidTickets"/>
+                <property datatype="string" name="compTickets"/>
+                <property datatype="string" name="percentCompTickets"/>
             </properties>
         </valueCollectionDatasource>
-        <valueCollectionDatasource id="individualSalesDs">
-            <query>
-                <![CDATA[select b.organisation.name, sum(b.totalPaidTickets)
-from omega$Booking b
-where b.show = :ds$showsDs
-group by b.organisation.name]]>
-            </query>
-            <properties>
-                <property class="com.srt.omega.entity.Show"
-                          name="show"/>
-                <property datatype="decimal"
-                          name="sum"/>
-            </properties>
-        </valueCollectionDatasource>
+
     </dsContext>
     <dialogMode height="600"
                 width="800"/>
     <layout expand="chartGrid"
             spacing="true">
         <grid id="showSelectionGrid" spacing="true">
-            <columns count="2"/>
+            <columns count="4"/>
             <rows>
                 <row>
+
+                    <lookupField id="organizationLookup"
+                                 caption="Select Organization"
+                                 optionsDatasource="organizationDs"
+                                 width="400px"/>
+
                     <lookupField id="showLookup"
                                  caption="Select Show"
                                  optionsDatasource="showsDs"
@@ -108,6 +91,7 @@ group by b.organisation.name]]>
                                  optionsDatasource="showTimeDs"
                                  width="400px"/>
 
+                    <button id="clearBttn" caption="Clear Filters" invoke="clearBttnEventHandler" align="MIDDLE_RIGHT"/>
                 </row>
             </rows>
         </grid>
@@ -122,10 +106,10 @@ group by b.organisation.name]]>
                     <table id="tableShowSummaryInfo" settingsEnabled="false" colspan="2" align="MIDDLE_CENTER">
                         <columns>
                             <column id="totalShowColumn" caption="Total Shows"/>
+                            <column id="ticketsAvailableColumn" caption="No of Available Tickets"/>
                             <column id="totalSalesColumn" caption="Total Sales"/>
                             <column id="weekendSalesColumn" caption="Weekend Sales"/>
                             <column id="weekdaySalesColumn" caption="Weekday Sales"/>
-                            <column id="ticketsAvailableColumn" caption="No of Available Tickets"/>
                             <column id="ticketsBookedColumn" caption="No of Tickets Booked"/>
                         </columns>
                         <rows datasource="showSummarySalesDs"/>
@@ -134,27 +118,29 @@ group by b.organisation.name]]>
                 </row>
                 <row>
                     <table id="tablePaymentsCategory" caption="Payment Category Summary"
-                           settingsEnabled="false">
+                           settingsEnabled="false" rowspan="1" colspan="1" columnControlVisible="false"
+                    >
                         <columns>
-                            <column id="category"/>
-                            <column id="totalCapacity"/>
-                            <column id="paidTickets"/>
-                            <column id="percentPaidTickets"/>
-                            <column id="compTickets"/>
-                            <column id="percentCompTickets"/>
+                            <column id="category" caption="Category"/>
+                            <column id="totalCapacity" caption="Total Capacity"/>
+                            <column id="paidTickets" caption="Paid Tickets"/>
+                            <column id="percentPaidTickets" caption="% Paid Tickets"/>
+                            <column id="compTickets" caption="Comp Tickets"/>
+                            <column id="percentCompTickets" caption="% Comp Tickets"/>
                         </columns>
                         <rows datasource="paymentCategoryDs"/>
                         <rowsCount/>
                     </table>
                     <table id="tableTicketCategory" caption="Ticket Category Summary"
-                           settingsEnabled="false">
+                           settingsEnabled="false" rowspan="1" colspan="1" columnControlVisible="false"
+                    >
                         <columns>
-                            <column id="category"/>
-                            <column id="totalCapacity"/>
-                            <column id="paidTickets"/>
-                            <column id="percentPaidTickets"/>
-                            <column id="compTickets"/>
-                            <column id="percentCompTickets"/>
+                            <column id="category" caption="Category"/>
+                            <column id="totalCapacity" caption="Total Capacity"/>
+                            <column id="paidTickets" caption="Paid Tickets"/>
+                            <column id="percentPaidTickets" caption="% Paid Tickets"/>
+                            <column id="compTickets" caption="Comp Tickets"/>
+                            <column id="percentCompTickets" caption="% Comp Tickets"/>
 
                         </columns>
                         <rows datasource="ticketCategoryDs"/>
@@ -163,30 +149,22 @@ group by b.organisation.name]]>
                     </table>
                 </row>
                 <row>
-                    <chart:pieChart id="salesByIndustry"
-                                    caption="Sales By Industry"
-                                    datasource="salesByIndustryDs"
-                                    titleField="show"
-                                    valueField="sum"
-                                    balloonText="[[title]]&lt;br&gt;&lt;span style='font-size:14px'&gt;
-                        &lt;strong&gt;[[value]]&lt;/strong&gt; ([[percents]]%)&lt;/span&gt;"/>
+                    <table id="tableOrganisationBookingInfo" caption="Organisation Booking Info"
+                           settingsEnabled="false" rowspan="1" colspan="2" columnControlVisible="false"
+                    >
+                        <columns>
+                            <column id="organisation" caption="Organisation"/>
+                            <column id="totalCapacity" caption="Total Capacity"/>
+                            <column id="paidTickets" caption="Paid Tickets"/>
+                            <column id="percentPaidTickets" caption="% Paid Tickets"/>
+                            <column id="compTickets" caption="Comp Tickets"/>
+                            <column id="percentCompTickets" caption="% Comp Tickets"/>
 
-                    <chart:pieChart id="individualSales"
-                                    caption="Sales By Organisation"
-                                    datasource="individualSalesDs"
-                                    titleField="show"
-                                    valueField="sum"
-                                    balloonText="[[title]]&lt;br&gt;&lt;span style='font-size:14px'&gt;
-                        &lt;strong&gt;[[value]]&lt;/strong&gt; ([[percents]]%)&lt;/span&gt;"/>
-                </row>
-                <row>
-                    <chart:pieChart id="salesByBookingStatus"
-                                    caption="Sales By Booking Status"
-                                    datasource="salesByBookingStatusDs"
-                                    titleField="bookingStatus"
-                                    valueField="sum"
-                                    balloonText="[[title]]&lt;br&gt;&lt;span style='font-size:14px'&gt;
-                        &lt;strong&gt;[[value]]&lt;/strong&gt; ([[percents]]%)&lt;/span&gt;" />
+                        </columns>
+                        <rows datasource="ticketOrganisationBookingDs"/>
+                        <rowsCount/>
+
+                    </table>
                 </row>
             </rows>
         </grid>
