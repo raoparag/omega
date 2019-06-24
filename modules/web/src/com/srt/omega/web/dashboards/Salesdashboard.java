@@ -12,6 +12,7 @@ import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.impl.ValueCollectionDatasourceImpl;
 import com.haulmont.cuba.gui.screen.Subscribe;
 import com.srt.omega.entity.*;
+import org.springframework.security.core.parameters.P;
 import org.springframework.util.CollectionUtils;
 
 import javax.inject.Inject;
@@ -19,6 +20,7 @@ import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -53,6 +55,9 @@ public class Salesdashboard extends AbstractWindow {
     @Named("ticketOrganisationBookingDs")
     private ValueCollectionDatasourceImpl collectionOrganisationBooking;
 
+    @Named("showTimingBookingInfoDs")
+    private ValueCollectionDatasourceImpl collectionShowTimingBookingInfo;
+
     @Inject
     private DataManager dataManager;
 
@@ -60,6 +65,8 @@ public class Salesdashboard extends AbstractWindow {
     private Notifications notifications;
 
     DecimalFormat df = new DecimalFormat("#.##");
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
     private CountDownLatch resetFilters = new CountDownLatch(0);
 
@@ -91,10 +98,16 @@ public class Salesdashboard extends AbstractWindow {
 
         if(primaryFilter != null){
             // Since Primary filter is selected, remove other data from list to make a clean view
-            if(primaryFilter instanceof Show){
+            if(primaryFilter instanceof Show && organisationLookupField.getValue() != null){
                 show.setOptionsList(Arrays.asList(show.getValue()));
-            }else if(primaryFilter instanceof Organisation){
+            }else if(primaryFilter instanceof Organisation && show.getValue() != null){
                 organisationLookupField.setOptionsList(Arrays.asList(organisationLookupField.getValue()));
+            }
+
+            // in case primary is changed to empty, clear all
+            if((primaryFilter instanceof Show && show.getValue() == null) ||
+                    (primaryFilter instanceof Organisation && organisationLookupField.getValue() == null)){
+                clearBttnEventHandler();
             }
         }else{
             if(show.getValue() != null && organisationLookupField.getValue() == null) {
@@ -369,6 +382,22 @@ public class Salesdashboard extends AbstractWindow {
                 .list();
         populateOrganisationBookingTable(organisationBookingList, totalCapacity);
 
+
+        /* Updating collectionOrganisationBooking */
+        queryString = "select b.showTiming, sum(b.paidTickets), sum(b.comps) from omega$BookingItem b" +
+                " inner join omega$Booking b1 on b.booking = b1" +
+                " where b1.show = :show" +
+                (!isShowTimingSelected ? "" : " and b.showTiming = :showTiming") +
+                (!isOrganisationSelected ? "" : " and b1.organisation = :organisation ") +
+                " group by b.showTiming ";
+
+        List<KeyValueEntity> showTimingBookingList = dataManager.loadValues(queryString)
+                .parameter("show", show.getValue())
+                .parameter("showTiming", showTimingField.getValue())
+                .parameter("organisation", organisationLookupField.getValue())
+                .properties("showTime", "paidTickets", "compTickets")
+                .list();
+        populateShowTiminigBookingTable(showTimingBookingList, totalCapacity);
     }
 
     private void populatePaymentsTable(List<KeyValueEntity> paymentCategoryList, final long totalCapacity) {
@@ -479,13 +508,52 @@ public class Salesdashboard extends AbstractWindow {
         collectionOrganisationBooking.refresh();
     }
 
+    /**
+     *
+     * @param showTimingBookingList
+     * @param totalCapacity Total capacity of venue across all show timings or for a particular day
+     */
+    private void populateShowTiminigBookingTable(List<KeyValueEntity> showTimingBookingList, long totalCapacity) {
+
+        showTimingBookingList.forEach(keyValueEntity -> {
+            KeyValueEntity newKeyValueEntity = new KeyValueEntity();
+            ShowTiming showTime = (ShowTiming) keyValueEntity.getValue("showTime");
+
+            Double paidTicketsValue = 0.0, compTicketsValue = 0.0;
+            String paidTicketsLbl = "0", compTicketsLbl = "0";
+            Object paidTickets = keyValueEntity.getValue("paidTickets");
+            if(paidTickets != null) {
+                paidTicketsLbl = paidTickets.toString();
+                paidTicketsValue = calculatePercent(Long.parseLong(paidTicketsLbl), totalCapacity);
+            }
+
+            Object compTickets = keyValueEntity.getValue("compTickets");
+            if(compTickets != null) {
+                compTicketsLbl = compTickets.toString();
+                compTicketsValue = calculatePercent(Long.parseLong(compTicketsLbl), totalCapacity);
+            }
+
+            newKeyValueEntity.setValue("showTime", dateFormat.format(showTime.getShowTime()));
+            newKeyValueEntity.setValue("totalCapacity", String.valueOf(totalCapacity));
+            newKeyValueEntity.setValue("paidTickets", paidTicketsLbl);
+            newKeyValueEntity.setValue("percentPaidTickets", df.format(paidTicketsValue) + "%");
+            newKeyValueEntity.setValue("compTickets", compTicketsLbl);
+            newKeyValueEntity.setValue("percentCompTickets", df.format(compTicketsValue) + "%");
+
+            collectionShowTimingBookingInfo.addItem(newKeyValueEntity);
+        });
+        collectionShowTimingBookingInfo.refresh();
+    }
+
     private void clearPreviousData() {
         collectionDatasourcePayment.revert();
         collectionDatasourceTicket.revert();
         collectionOrganisationBooking.revert();
+        collectionShowTimingBookingInfo.revert();
         collectionDatasourcePayment.setRefreshMode(CollectionDatasource.RefreshMode.NEVER);
         collectionDatasourceTicket.setRefreshMode(CollectionDatasource.RefreshMode.NEVER);
         collectionOrganisationBooking.setRefreshMode(CollectionDatasource.RefreshMode.NEVER);
+        collectionShowTimingBookingInfo.setRefreshMode(CollectionDatasource.RefreshMode.NEVER);
     }
 
     private void loadEmptyData(long totalCapacity, boolean isShowTimingSelected, int showTimeCount) {
@@ -514,7 +582,7 @@ public class Salesdashboard extends AbstractWindow {
 
 
     /**
-     * Invoked by <code>clearBttn</code> component
+     * Invoked by <code>clearBttn</code> component and when primary filter is deselected
      */
     public void clearBttnEventHandler(){
         int countSelectedFilters = 0;
