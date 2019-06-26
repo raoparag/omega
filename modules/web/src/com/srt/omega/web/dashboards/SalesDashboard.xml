@@ -65,7 +65,17 @@
                 <property datatype="string" name="percentCompTickets"/>
             </properties>
         </valueCollectionDatasource>
-
+        <valueCollectionDatasource id="showTimingBookingInfoDs">
+            <query></query>
+            <properties>
+                <property datatype="string" name="showTime"/>
+                <property datatype="string" name="totalCapacity"/>
+                <property datatype="string" name="paidTickets"/>
+                <property datatype="string" name="percentPaidTickets"/>
+                <property datatype="string" name="compTickets"/>
+                <property datatype="string" name="percentCompTickets"/>
+            </properties>
+        </valueCollectionDatasource>
     </dsContext>
     <dialogMode height="600"
                 width="800"/>
@@ -150,7 +160,7 @@
                 </row>
                 <row>
                     <table id="tableOrganisationBookingInfo" caption="Organisation Booking Info"
-                           settingsEnabled="false" rowspan="1" colspan="2" columnControlVisible="false"
+                           settingsEnabled="false" rowspan="1" colspan="1" columnControlVisible="false"
                     >
                         <columns>
                             <column id="organisation" caption="Organisation"/>
@@ -162,6 +172,22 @@
 
                         </columns>
                         <rows datasource="ticketOrganisationBookingDs"/>
+                        <rowsCount/>
+
+                    </table>
+                    <table id="tableShowTimingBookingInfo" caption="Show Timing Booking Info"
+                           settingsEnabled="false" rowspan="1" colspan="1" columnControlVisible="false"
+                    >
+                        <columns>
+                            <column id="showTime" caption="Show Time"/>
+                            <column id="totalCapacity" caption="Total Capacity"/>
+                            <column id="paidTickets" caption="Paid Tickets"/>
+                            <column id="percentPaidTickets" caption="% Paid Tickets"/>
+                            <column id="compTickets" caption="Comp Tickets"/>
+                            <column id="percentCompTickets" caption="% Comp Tickets"/>
+
+                        </columns>
+                        <rows datasource="showTimingBookingInfoDs"/>
                         <rowsCount/>
 
                     </table>
